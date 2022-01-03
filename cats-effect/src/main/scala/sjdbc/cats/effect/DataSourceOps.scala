@@ -13,31 +13,19 @@ import cats.effect.kernel.Resource.ExitCase
 
 class DataSourceOps(dataSource: DataSource):
 
+  private val dataSourceOps = new sjdbc.core.DataSourceOps(dataSource)
+
   def readOnly[F[_]: Sync]: Resource[F, Connection] =
     Resource
-      .make(Sync[F].blocking {
-        val conn = dataSource.getConnection
-        conn.setReadOnly(true)
-        conn
-      })(conn => Sync[F].blocking(conn.close()))
+      .make(Sync[F].blocking(dataSourceOps.readOnly()))(conn => Sync[F].blocking(conn.close()))
 
   def autoCommit[F[_]: Sync]: Resource[F, Connection] =
     Resource
-      .make(Sync[F].blocking {
-        val conn = dataSource.getConnection
-        conn.setReadOnly(false)
-        conn.setAutoCommit(true)
-        conn
-      })(conn => Sync[F].blocking(conn.close()))
+      .make(Sync[F].blocking(dataSourceOps.autoCommit()))(conn => Sync[F].blocking(conn.close()))
 
   def transaction[F[_]: Sync]: Resource[F, Connection] =
     Resource
-      .makeCase(Sync[F].blocking {
-        val conn = dataSource.getConnection
-        conn.setReadOnly(false)
-        conn.setAutoCommit(false)
-        conn
-      }) {
+      .makeCase(Sync[F].blocking(dataSourceOps.begin())) {
         case (conn, ExitCase.Errored(e)) =>
           Sync[F].blocking(conn.rollback()) *> Sync[F].blocking(conn.close()) *> Sync[F].raiseError(e)
         case (conn, _) =>

@@ -13,6 +13,7 @@ import cats.effect.implicits._
 import cats.effect.unsafe.implicits.global
 import java.sql.Connection
 import sjdbc.core._
+import sjdbc.cats.effect.syntax._
 import org.h2.jdbcx.JdbcDataSource
 
 class CatsEffectTest extends FunSuite:

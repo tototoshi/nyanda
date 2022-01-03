@@ -3,8 +3,8 @@ package sjdbc.cats.effect
 import sjdbc.core._
 import java.sql.Connection
 import java.sql.ResultSet
-import _root_.cats.effect.kernel.Sync
-import _root_.cats.data.Kleisli
+import cats.effect.kernel.Sync
+import cats.data.Kleisli
 
 trait Dsl[F[_]] {
   def update(sql: SQL): Kleisli[F, Connection, Int]
@@ -19,10 +19,10 @@ object Dsl {
 
   implicit def impl[F[_]: Sync]: Dsl[F] = new Dsl[F] {
     def update(sql: SQL): Kleisli[F, Connection, Int] = Kleisli { conn =>
-      Sync[F].blocking(conn.update(sql))
+      Sync[F].blocking(new ConnectionOps(conn).update(sql))
     }
     def query(sql: SQL): Kleisli[F, Connection, ResultSet] = Kleisli { conn =>
-      Sync[F].blocking(conn.query(sql))
+      Sync[F].blocking(new ConnectionOps(conn).query(sql))
     }
 
     def option[A](parser: ResultSetParser[A]): Kleisli[F, ResultSet, Option[A]] = Kleisli { rs =>

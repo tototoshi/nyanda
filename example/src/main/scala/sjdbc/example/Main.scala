@@ -2,6 +2,7 @@ package sjdbc.example
 
 import sjdbc.core._
 import sjdbc.cats.effect._
+import sjdbc.cats.effect.syntax._
 import cats._
 import cats.data.Kleisli
 import cats.implicits._

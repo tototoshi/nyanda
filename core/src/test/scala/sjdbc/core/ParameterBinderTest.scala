@@ -7,6 +7,7 @@ import scala.util.Using
 import java.sql.PreparedStatement
 import java.sql.Connection
 import org.mockito.Mockito
+import sjdbc.core.syntax._
 
 class ParameterBinderTest extends FunSuite:
 

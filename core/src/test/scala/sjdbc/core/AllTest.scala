@@ -5,6 +5,7 @@ import javax.sql.DataSource
 import org.h2.jdbcx.JdbcDataSource
 import scala.util.Using
 import java.sql.Connection
+import sjdbc.core.syntax._
 
 class AllTest extends FunSuite:
 

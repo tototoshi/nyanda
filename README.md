@@ -4,6 +4,7 @@ Extension methods for jdbc
 
 ```scala
 import sjdbc.core._
+import sjdbc.core.syntax._
 
 Using.resource(dataSource.getConnection()) { conn =>
   people.foreach { p =>
@@ -19,6 +20,7 @@ Using.resource(dataSource.getConnection()) { conn =>
 ```scala
 import sjdbc.core._
 import sjdbc.cats.effect._
+import sjdbc.cats.effect.syntax._
 
 def queryGroup[F[_]: Sync: Console]: Kleisli[F, Connection, (Option[Person], Seq[Person])] =
   val dsl = Dsl[F]
