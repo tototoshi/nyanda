@@ -6,74 +6,66 @@ import org.h2.jdbcx.JdbcDataSource
 import scala.util.Using
 import java.sql.PreparedStatement
 import java.sql.Connection
+import org.mockito.Mockito
 
 class ParameterBinderTest extends FunSuite:
 
-  private val dataSource: DataSource =
-    val ds = new JdbcDataSource()
-    ds.setUrl("jdbc:h2:mem:core-ParameterBinderTest;DB_CLOSE_DELAY=1")
-    ds.setUser("sa")
-    ds.setPassword("")
-    ds
+  test("Bind Int") {
+    val id = 1
+    val sql = sql"select id from person where id = $id"
+    assertEquals(sql.statement, "select id from person where id = ?")
+    assertEquals(sql.params.size, 1)
 
-  case class Person(id: Int, name: String)
+    val mock: PreparedStatement = Mockito.mock(classOf[PreparedStatement])
+    sql.params.head.bind(mock, 1)
+    Mockito.verify(mock).setInt(1, 1)
+  }
 
-  def ddl(conn: Connection): Int =
-    conn.update(sql"""
-      create table if not exists person(
-        id integer not null,
-        name varchar(32) not null,
-        primary key(id)
-      )
-    """)
+  test("Bind String") {
+    val id = "1"
+    val sql = sql"select id from person where id = $id"
+    assertEquals(sql.statement, "select id from person where id = ?")
+    assertEquals(sql.params.size, 1)
 
-  def truncate(conn: Connection): Int =
-    conn.update(sql"truncate table person")
+    val mock: PreparedStatement = Mockito.mock(classOf[PreparedStatement])
+    sql.params.head.bind(mock, 1)
+    Mockito.verify(mock).setString(1, "1")
+  }
 
-  override def beforeEach(context: BeforeEach): Unit =
-    Using.resource(dataSource.getConnection) { conn =>
-      ddl(conn)
-    }
+  test("Bind Option[T]") {
+    val id1: Option[Int] = Some(1)
+    val id2: Option[Int] = None
+    val sql = sql"select id from person where id = $id1 or id = $id2"
+    assertEquals(sql.statement, "select id from person where id = ? or id = ?")
+    assertEquals(sql.params.size, 2)
 
-  override def afterEach(context: AfterEach): Unit =
-    Using.resource(dataSource.getConnection) { conn =>
-      truncate(conn)
-    }
+    val mock1: PreparedStatement = Mockito.mock(classOf[PreparedStatement])
+    sql.params.head.bind(mock1, 1)
+    Mockito.verify(mock1).setInt(1, 1)
 
-  test("ParameterBunder") {
-    val person1 = Person(1, "Takahashi")
-    val person2 = Person(2, "Suzuki")
-    val person3 = Person(3, "Sato")
+    val mock2: PreparedStatement = Mockito.mock(classOf[PreparedStatement])
+    sql.params(1).bind(mock2, 1)
+    Mockito.verify(mock2).setInt(1, null.asInstanceOf[Int])
+  }
 
-    val people =
-      List(
-        person1,
-        person2,
-        person3
-      )
+  test("Bind Some[T]") {
+    val id: Some[Int] = Some(1)
+    val sql = sql"select id from person where id = $id"
+    assertEquals(sql.statement, "select id from person where id = ?")
+    assertEquals(sql.params.size, 1)
 
-    val parser =
-      ResultSetParser { rs =>
-        Person(id = rs.int("id"), name = rs.string("name"))
-      }
+    val mock: PreparedStatement = Mockito.mock(classOf[PreparedStatement])
+    sql.params.head.bind(mock, 1)
+    Mockito.verify(mock).setInt(1, 1)
+  }
 
-    Using.resource(dataSource.getConnection()) { conn =>
-      people.foreach { p =>
-        val id = new ParameterBinder {
-          def bind(statement: PreparedStatement, index: Int): Unit =
-            statement.setInt(index, p.id)
-        }
-        val name = new ParameterBinder {
-          def bind(statement: PreparedStatement, index: Int): Unit =
-            statement.setString(index, p.name)
-        }
-        conn.update(sql"insert into person (id, name) values (${id}, ${name})")
-      }
+  test("Bind None") {
+    val id: None.type = None
+    val sql = sql"select id from person where id = $id"
+    assertEquals(sql.statement, "select id from person where id = ?")
+    assertEquals(sql.params.size, 1)
 
-      val result1 = conn.query(sql"select id, name from person where id = ${1}").option(parser)
-      val result2 = conn.query(sql"select id, name from person order by id").seq(parser)
-
-      assertEquals(result1, Some(Person(1, "Takahashi")))
-      assertEquals(result2, people)
-    }
+    val mock: PreparedStatement = Mockito.mock(classOf[PreparedStatement])
+    sql.params.head.bind(mock, 1)
+    Mockito.verify(mock).setObject(1, null)
   }

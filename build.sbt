@@ -16,7 +16,10 @@ lazy val core = project
   .in(file("core"))
   .settings(
     commonDependencies,
-    name := "sjdbc-core"
+    name := "sjdbc-core",
+    libraryDependencies ++= Seq(
+      "org.mockito" % "mockito-all" % "2.0.2-beta"
+    )
   )
 
 lazy val `cats-effect` = project
