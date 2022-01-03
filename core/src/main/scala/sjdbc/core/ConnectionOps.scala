@@ -1,8 +1,8 @@
 package sjdbc.core
 
 import java.sql.Connection
-import java.sql.PreparedStatement
 import java.sql.ResultSet
+import java.sql.PreparedStatement
 
 class ConnectionOps(connection: Connection):
 
@@ -17,11 +17,4 @@ class ConnectionOps(connection: Connection):
     s.executeUpdate()
 
   private def bindParams(sql: SQL, s: PreparedStatement) =
-    sql.params.zipWithIndex.foreach {
-      case (p: Int, idx) => s.setInt(idx + 1, p)
-      case (p: Long, idx) => s.setLong(idx + 1, p)
-      case (p: Float, idx) => s.setFloat(idx + 1, p)
-      case (p: String, idx) => s.setString(idx + 1, p)
-      case (p: ParameterBinder, idx) => p.bind(s, idx + 1)
-      case (p, _) => throw new ParameterBindException(s"Parameter bind failed. [param=$p]")
-    }
+    sql.params.zipWithIndex.foreach { case (p, index) => p.bind(s, index + 1) }

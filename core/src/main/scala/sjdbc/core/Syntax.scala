@@ -6,7 +6,7 @@ import java.sql.ResultSet
 trait Syntax:
 
   extension (sc: StringContext)
-    def sql(args: Any*): SQL = {
+    def sql(args: ParameterBinder*): SQL = {
       val strings = sc.parts.iterator
       val expressions = args.iterator
       SQL(
@@ -14,6 +14,9 @@ trait Syntax:
         params = expressions.toSeq
       )
     }
+
+  implicit def toParameterBinder[A](value: A)(implicit f: ParameterBinderFactory[A]): ParameterBinder =
+    f.binder(value)
 
   extension (connection: Connection) def query[A](stmt: SQL): ResultSet = new ConnectionOps(connection).query(stmt)
   extension (connection: Connection) def update[A](stmt: SQL): Int = new ConnectionOps(connection).update(stmt)
