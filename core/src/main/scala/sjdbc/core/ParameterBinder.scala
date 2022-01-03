@@ -27,6 +27,14 @@ object ParameterBinderFactory:
     statement.setInt(index, value)
   }
 
+  implicit def longBind: ParameterBinderFactory[Long] = ParameterBinderFactory { (statement, index, value) =>
+    statement.setLong(index, value)
+  }
+
+  implicit def shortBind: ParameterBinderFactory[Short] = ParameterBinderFactory { (statement, index, value) =>
+    statement.setShort(index, value)
+  }
+
   implicit def stringBind: ParameterBinderFactory[String] = ParameterBinderFactory { (statement, index, value) =>
     statement.setString(index, value)
   }

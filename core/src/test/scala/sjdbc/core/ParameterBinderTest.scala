@@ -22,6 +22,28 @@ class ParameterBinderTest extends FunSuite:
     Mockito.verify(mock).setInt(1, 1)
   }
 
+  test("Bind Short") {
+    val id: Short = 1
+    val sql = sql"select id from person where id = $id"
+    assertEquals(sql.statement, "select id from person where id = ?")
+    assertEquals(sql.params.size, 1)
+
+    val mock: PreparedStatement = Mockito.mock(classOf[PreparedStatement])
+    sql.params.head.bind(mock, 1)
+    Mockito.verify(mock).setShort(1, 1)
+  }
+
+  test("Bind Long") {
+    val id = 1L
+    val sql = sql"select id from person where id = $id"
+    assertEquals(sql.statement, "select id from person where id = ?")
+    assertEquals(sql.params.size, 1)
+
+    val mock: PreparedStatement = Mockito.mock(classOf[PreparedStatement])
+    sql.params.head.bind(mock, 1)
+    Mockito.verify(mock).setLong(1, 1L)
+  }
+
   test("Bind String") {
     val id = "1"
     val sql = sql"select id from person where id = $id"
