@@ -6,12 +6,12 @@ import java.sql.ResultSet
 
 class ConnectionOps(connection: Connection):
 
-  def query[A](sql: SQL): ResultSet =
+  def query(sql: SQL): ResultSet =
     val s = connection.prepareStatement(sql.statement)
     bindParams(sql, s)
     s.executeQuery()
 
-  def update[A](sql: SQL): Int =
+  def update(sql: SQL): Int =
     val s = connection.prepareStatement(sql.statement)
     bindParams(sql, s)
     s.executeUpdate()
