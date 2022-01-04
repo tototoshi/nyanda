@@ -7,44 +7,33 @@ ThisBuild / scalaVersion := scalaVersion_3
 lazy val commonDependencies = Seq(
   libraryDependencies ++= Seq(
     "com.h2database" % "h2" % "2.0.204" % Test,
-    "org.typelevel" %% "cats-effect" % "3.3.1" % Test,
-    "org.scalameta" %% "munit" % "1.0.0-M1" % Test
+    "org.scalameta" %% "munit" % "1.0.0-M1" % Test,
+    "org.mockito" % "mockito-all" % "2.0.2-beta" % Test
   )
 )
 
-lazy val core = project
-  .in(file("core"))
+lazy val module = project
+  .in(file("module"))
   .settings(
     commonDependencies,
-    name := "sjdbc-core",
-    libraryDependencies ++= Seq(
-      "org.mockito" % "mockito-all" % "2.0.2-beta"
-    )
-  )
-
-lazy val `cats-effect` = project
-  .in(file("cats-effect"))
-  .settings(
-    commonDependencies,
-    name := "sjdbc-cats-effect",
+    name := "nyanda",
     libraryDependencies ++= Seq(
       "org.typelevel" %% "cats-effect" % "3.3.1"
     )
   )
-  .dependsOn(core)
 
 lazy val example = project
   .in(file("example"))
   .settings(
     commonDependencies,
-    name := "sjdbc-example",
+    name := "nyanda-example",
     libraryDependencies ++= Seq(
       "com.h2database" % "h2" % "2.0.204"
     ),
     run / fork := true
   )
-  .dependsOn(`cats-effect`)
+  .dependsOn(module)
 
 lazy val root = project
   .in(file("."))
-  .aggregate(core, `cats-effect`, example)
+  .aggregate(module, example)
