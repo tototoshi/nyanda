@@ -15,11 +15,12 @@ object DB {
   def apply[F[_]](implicit ev: DB[F]) = ev
 
   implicit def impl[F[_]: Sync]: DB[F] = new DB[F] {
+
     def update(sql: SQL): Kleisli[F, Connection, Int] = Kleisli { conn =>
-      Sync[F].blocking(new ConnectionOps(conn).update(sql))
+      new ConnectionOps[F](conn).update(sql)
     }
     def query[A](sql: SQL, reader: ResultSetReader[A]): Kleisli[F, Connection, A] = Kleisli { conn =>
-      Sync[F].blocking(new ConnectionOps(conn).query(sql, reader))
+      new ConnectionOps[F](conn).query(sql, reader)
     }
 
   }
