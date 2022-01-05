@@ -1,6 +1,8 @@
 package nyanda
 
 import java.sql.PreparedStatement
+import java.time.Instant
+import java.util.Date
 
 trait ToParameterBinder[-A]:
   def binder(value: A): ParameterBinder
@@ -29,6 +31,19 @@ object ToParameterBinder:
 
   implicit def stringBind: ToParameterBinder[String] = ToParameterBinder { (statement, index, value) =>
     statement.setString(index, value)
+  }
+
+  implicit def javaSqlTimestampBind: ToParameterBinder[java.sql.Timestamp] = ToParameterBinder {
+    (statement, index, value) =>
+      statement.setTimestamp(index, value)
+  }
+
+  implicit def javaUtilDateBind: ToParameterBinder[Date] = ToParameterBinder { (statement, index, value) =>
+    statement.setTimestamp(index, new java.sql.Timestamp(value.getTime))
+  }
+
+  implicit def javaTimeInstantBind: ToParameterBinder[Instant] = ToParameterBinder { (statement, index, value) =>
+    statement.setTimestamp(index, java.sql.Timestamp.from(value))
   }
 
   implicit def optionBind[T](implicit b: ToParameterBinder[T]): ToParameterBinder[Option[T]] =
