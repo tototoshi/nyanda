@@ -5,7 +5,13 @@ import java.time.Instant
 import java.util.Date
 
 trait ToParameterBinder[-A]:
+  self =>
+
   def binder(value: A): ParameterBinder
+
+  def from[B](f: B => A): ToParameterBinder[B] = new ToParameterBinder[B] {
+    def binder(value: B): ParameterBinder = self.binder(f(value))
+  }
 
 object ToParameterBinder:
 
@@ -38,22 +44,14 @@ object ToParameterBinder:
       statement.setTimestamp(index, value)
   }
 
-  implicit def javaUtilDateBind: ToParameterBinder[Date] = ToParameterBinder { (statement, index, value) =>
-    statement.setTimestamp(index, new java.sql.Timestamp(value.getTime))
-  }
+  implicit def javaUtilDateBind(implicit b: ToParameterBinder[java.sql.Timestamp]): ToParameterBinder[Date] =
+    b.from(d => new java.sql.Timestamp(d.getTime))
 
-  implicit def javaTimeInstantBind: ToParameterBinder[Instant] = ToParameterBinder { (statement, index, value) =>
-    statement.setTimestamp(index, java.sql.Timestamp.from(value))
-  }
+  implicit def javaTimeInstantBind(implicit b: ToParameterBinder[java.sql.Timestamp]): ToParameterBinder[Instant] =
+    b.from(java.sql.Timestamp.from)
 
   implicit def optionBind[T](implicit b: ToParameterBinder[T]): ToParameterBinder[Option[T]] =
-    new ToParameterBinder[Option[T]] {
-      def binder(value: Option[T]): ParameterBinder =
-        value match {
-          case Some(v) => b.binder(v)
-          case None => b.binder(null.asInstanceOf[T])
-        }
-    }
+    b.from(o => o.orNull.asInstanceOf[T])
 
   implicit def noneBind: ToParameterBinder[None.type] =
     ToParameterBinder { (statement, index, value) => statement.setObject(index, null) }
