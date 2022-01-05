@@ -18,7 +18,7 @@ lazy val module = project
     commonDependencies,
     name := "nyanda",
     libraryDependencies ++= Seq(
-      "org.typelevel" %% "cats-effect" % "3.3.1"
+      "org.typelevel" %% "cats-effect" % "3.3.3"
     )
   )
 
