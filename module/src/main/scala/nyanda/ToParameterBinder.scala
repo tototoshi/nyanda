@@ -3,6 +3,9 @@ package nyanda
 import java.sql.PreparedStatement
 import java.time.Instant
 import java.util.Date
+import java.time.ZonedDateTime
+import java.time.LocalDateTime
+import java.time.ZoneId
 
 trait ToParameterBinder[-A]:
   self =>
@@ -49,6 +52,13 @@ object ToParameterBinder:
 
   implicit def javaTimeInstantBind(implicit b: ToParameterBinder[java.sql.Timestamp]): ToParameterBinder[Instant] =
     b.from(java.sql.Timestamp.from)
+
+  implicit def zonedDateTimeBind(implicit b: ToParameterBinder[java.time.Instant]): ToParameterBinder[ZonedDateTime] =
+    b.from(zdt => zdt.toInstant)
+
+  implicit def localDateTimeBind(implicit
+      b: ToParameterBinder[java.time.ZonedDateTime]
+  ): ToParameterBinder[LocalDateTime] = b.from(ldt => ZonedDateTime.of(ldt, ZoneId.systemDefault))
 
   implicit def optionBind[T](implicit b: ToParameterBinder[T]): ToParameterBinder[Option[T]] =
     b.from(o => o.orNull.asInstanceOf[T])

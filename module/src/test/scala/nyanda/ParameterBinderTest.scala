@@ -10,6 +10,11 @@ import org.mockito.Mockito
 import nyanda.syntax._
 import java.time.Instant
 import java.util.Date
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import org.mockito.cglib.core.Local
+import java.time.LocalDate
 
 class ParameterBinderTest extends FunSuite:
 
@@ -88,6 +93,28 @@ class ParameterBinderTest extends FunSuite:
     val mock: PreparedStatement = Mockito.mock(classOf[PreparedStatement])
     sql.params.head.bind(mock, 1)
     Mockito.verify(mock).setTimestamp(1, java.sql.Timestamp.from(createdAt))
+  }
+
+  test("Bind java.time.LocalDateTime") {
+    val createdAt = LocalDateTime.ofInstant(Instant.ofEpochMilli(0), ZoneId.systemDefault)
+    val sql = sql"select id from person where created_at > ${createdAt}"
+    assertEquals(sql.statement, "select id from person where created_at > ?")
+    assertEquals(sql.params.size, 1)
+
+    val mock: PreparedStatement = Mockito.mock(classOf[PreparedStatement])
+    sql.params.head.bind(mock, 1)
+    Mockito.verify(mock).setTimestamp(1, java.sql.Timestamp.from(Instant.ofEpochMilli(0)))
+  }
+
+  test("Bind java.time.ZonedDateTime") {
+    val createdAt = ZonedDateTime.ofInstant(Instant.ofEpochMilli(0), ZoneId.systemDefault)
+    val sql = sql"select id from person where created_at > ${createdAt}"
+    assertEquals(sql.statement, "select id from person where created_at > ?")
+    assertEquals(sql.params.size, 1)
+
+    val mock: PreparedStatement = Mockito.mock(classOf[PreparedStatement])
+    sql.params.head.bind(mock, 1)
+    Mockito.verify(mock).setTimestamp(1, java.sql.Timestamp.from(Instant.ofEpochMilli(0)))
   }
 
   test("Bind Option[T]") {
