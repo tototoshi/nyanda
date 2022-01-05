@@ -33,3 +33,7 @@ def queryGroup[F[_]: Sync: Console]: Kleisli[F, Connection, (Option[Person], Seq
 override def run(args: List[String]): IO[ExitCode] =
   dataSource.transaction[IO].use(queryGroup[IO].run).map(_ => ExitCode.Success)
 ```
+
+## License
+[Apache 2.0](http://www.apache.org/licenses/LICENSE-2.0)
+
