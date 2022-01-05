@@ -6,31 +6,24 @@ import scala.collection.mutable.ListBuffer
 trait ResultSetReader[T]:
   self =>
 
+  private def iterator(rs: ResultSet): Iterator[ResultSet] = Iterator.unfold(rs) { rs =>
+    if (rs.next()) Some((rs, rs)) else None
+  }
+
   def read(rs: ResultSet): T
 
   def option: ResultSetReader[Option[T]] =
     new ResultSetReader[Option[T]] {
       def read(rs: ResultSet): Option[T] =
-        if (rs.next()) {
-          val result = self.read(rs)
-          if (rs.next()) {
-            throw new TooManyRowException("More than single record are found")
-          } else {
-            Some(result)
-          }
-        } else {
-          None
-        }
+        val it = iterator(rs)
+        it.take(1).toSeq.headOption.map(self.read)
     }
 
   def seq: ResultSetReader[Seq[T]] =
     new ResultSetReader[Seq[T]] {
       def read(rs: ResultSet): Seq[T] =
-        val buffer: ListBuffer[T] = ListBuffer.empty[T]
-        while (rs.next()) {
-          buffer += self.read(rs)
-        }
-        buffer.toSeq
+        val it = iterator(rs)
+        it.map(self.read).toSeq
     }
 
 object ResultSetReader:
