@@ -5,9 +5,11 @@ import java.sql.ResultSet
 import cats.effect.kernel.Sync
 import cats.data.Kleisli
 
-trait DB[F[_]] {
+trait DB[F[_]] extends ResultSetGetInstances[F] with ResultSetReadInstances[F] {
   def update(sql: SQL): Kleisli[F, Connection, Int]
-  def query[A](sql: SQL, reader: ResultSetReader[A]): Kleisli[F, Connection, A]
+  def query[A](sql: SQL): Kleisli[F, Connection, ResultSet]
+  def as[A](implicit g: ResultSetRead[F, A]): Kleisli[F, ResultSet, A]
+  def get[A](column: String)(implicit g: ResultSetGet[F, A]): Kleisli[F, ResultSet, A]
 }
 
 object DB {
@@ -19,9 +21,14 @@ object DB {
     def update(sql: SQL): Kleisli[F, Connection, Int] = Kleisli { conn =>
       new ConnectionOps[F](conn).update(sql)
     }
-    def query[A](sql: SQL, reader: ResultSetReader[A]): Kleisli[F, Connection, A] = Kleisli { conn =>
-      new ConnectionOps[F](conn).query(sql, reader)
+
+    def query[A](sql: SQL): Kleisli[F, Connection, ResultSet] = Kleisli { conn =>
+      new ConnectionOps[F](conn).query(sql)
     }
+
+    def as[A](implicit g: ResultSetRead[F, A]): Kleisli[F, ResultSet, A] = Kleisli(g.read)
+
+    def get[A](column: String)(implicit g: ResultSetGet[F, A]): Kleisli[F, ResultSet, A] = g.get(column)
 
   }
 

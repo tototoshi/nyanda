@@ -8,7 +8,7 @@ import cats.implicits._
 import cats.effect._
 import cats.effect.kernel.Resource
 import cats.effect.std.Console
-import java.sql.Connection
+import java.sql.{Connection, ResultSet}
 import javax.sql.DataSource
 import org.h2.jdbcx.JdbcDataSource
 
@@ -34,11 +34,16 @@ object Main extends IOApp:
       person3
     )
 
-  val reader = ResultSetReader { rs => Person(id = rs.int("id"), name = rs.string("name")) }
-
   def queryGroup[F[_]: Sync: Console]: Kleisli[F, Connection, (Option[Person], Seq[Person])] =
+    val db: DB[F] = DB[F]
+    import db._
+
+    val personGet = (get[Int]("id"), get[String]("name")).mapN((id, s) => Person(id, s))
+
+    implicit def reader: ResultSetRead[F, Person] = ResultSetRead(personGet)
+
     for {
-      _ <- DB[F].update(sql"""
+      _ <- update(sql"""
                     create table if not exists person(
                       id integer not null,
                       name varchar(32) not null,
@@ -46,11 +51,11 @@ object Main extends IOApp:
                     )
                     """)
       _ <- people.traverse { p =>
-        DB[F].update(sql"insert into person (id, name) values (${p.id}, ${p.name})")
+        update(sql"insert into person (id, name) values (${p.id}, ${p.name})")
       }
-      result1 <- DB[F].query(sql"select id, name from person where id = ${1}", reader.option)
-      result2 <- DB[F].query(sql"select id, name from person", reader.seq)
+      result1 <- query(sql"select id, name from person where id = ${1}") >>> as[Option[Person]]
       _ <- Kleisli.liftF(Console[F].println(result1))
+      result2 <- query(sql"select id, name from person") >>> as[Seq[Person]]
       _ <- Kleisli.liftF(Console[F].println(result2))
     } yield (result1, result2)
 
