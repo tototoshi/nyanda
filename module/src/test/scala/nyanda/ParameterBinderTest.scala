@@ -6,27 +6,24 @@ import org.h2.jdbcx.JdbcDataSource
 import scala.util.Using
 import java.sql.PreparedStatement
 import java.sql.Connection
-import org.mockito.Mockito
-import nyanda.syntax._
 import java.time.Instant
 import java.util.Date
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
-import org.mockito.cglib.core.Local
 import java.time.LocalDate
+import cats.effect.IO
 
 class ParameterBinderTest extends FunSuite:
+
+  private val db: DB[IO] = DB[IO]
+  import db._
 
   test("Bind Int") {
     val id = 1
     val sql = sql"select id from person where id = $id"
     assertEquals(sql.statement, "select id from person where id = ?")
     assertEquals(sql.params.size, 1)
-
-    val mock: PreparedStatement = Mockito.mock(classOf[PreparedStatement])
-    sql.params.head.bind(mock, 1)
-    Mockito.verify(mock).setInt(1, 1)
   }
 
   test("Bind Short") {
@@ -34,10 +31,6 @@ class ParameterBinderTest extends FunSuite:
     val sql = sql"select id from person where id = $id"
     assertEquals(sql.statement, "select id from person where id = ?")
     assertEquals(sql.params.size, 1)
-
-    val mock: PreparedStatement = Mockito.mock(classOf[PreparedStatement])
-    sql.params.head.bind(mock, 1)
-    Mockito.verify(mock).setShort(1, 1)
   }
 
   test("Bind Long") {
@@ -45,10 +38,6 @@ class ParameterBinderTest extends FunSuite:
     val sql = sql"select id from person where id = $id"
     assertEquals(sql.statement, "select id from person where id = ?")
     assertEquals(sql.params.size, 1)
-
-    val mock: PreparedStatement = Mockito.mock(classOf[PreparedStatement])
-    sql.params.head.bind(mock, 1)
-    Mockito.verify(mock).setLong(1, 1L)
   }
 
   test("Bind String") {
@@ -56,10 +45,6 @@ class ParameterBinderTest extends FunSuite:
     val sql = sql"select id from person where id = $id"
     assertEquals(sql.statement, "select id from person where id = ?")
     assertEquals(sql.params.size, 1)
-
-    val mock: PreparedStatement = Mockito.mock(classOf[PreparedStatement])
-    sql.params.head.bind(mock, 1)
-    Mockito.verify(mock).setString(1, "1")
   }
 
   test("Bind java.sql.Timestamp") {
@@ -67,10 +52,6 @@ class ParameterBinderTest extends FunSuite:
     val sql = sql"select id from person where created_at > ${createdAt}"
     assertEquals(sql.statement, "select id from person where created_at > ?")
     assertEquals(sql.params.size, 1)
-
-    val mock: PreparedStatement = Mockito.mock(classOf[PreparedStatement])
-    sql.params.head.bind(mock, 1)
-    Mockito.verify(mock).setTimestamp(1, createdAt)
   }
 
   test("Bind java.util.Date") {
@@ -78,10 +59,6 @@ class ParameterBinderTest extends FunSuite:
     val sql = sql"select id from person where created_at > ${createdAt}"
     assertEquals(sql.statement, "select id from person where created_at > ?")
     assertEquals(sql.params.size, 1)
-
-    val mock: PreparedStatement = Mockito.mock(classOf[PreparedStatement])
-    sql.params.head.bind(mock, 1)
-    Mockito.verify(mock).setTimestamp(1, new java.sql.Timestamp(0))
   }
 
   test("Bind java.time.Instant") {
@@ -89,10 +66,6 @@ class ParameterBinderTest extends FunSuite:
     val sql = sql"select id from person where created_at > ${createdAt}"
     assertEquals(sql.statement, "select id from person where created_at > ?")
     assertEquals(sql.params.size, 1)
-
-    val mock: PreparedStatement = Mockito.mock(classOf[PreparedStatement])
-    sql.params.head.bind(mock, 1)
-    Mockito.verify(mock).setTimestamp(1, java.sql.Timestamp.from(createdAt))
   }
 
   test("Bind java.time.LocalDateTime") {
@@ -100,10 +73,6 @@ class ParameterBinderTest extends FunSuite:
     val sql = sql"select id from person where created_at > ${createdAt}"
     assertEquals(sql.statement, "select id from person where created_at > ?")
     assertEquals(sql.params.size, 1)
-
-    val mock: PreparedStatement = Mockito.mock(classOf[PreparedStatement])
-    sql.params.head.bind(mock, 1)
-    Mockito.verify(mock).setTimestamp(1, java.sql.Timestamp.from(Instant.ofEpochMilli(0)))
   }
 
   test("Bind java.time.ZonedDateTime") {
@@ -111,10 +80,6 @@ class ParameterBinderTest extends FunSuite:
     val sql = sql"select id from person where created_at > ${createdAt}"
     assertEquals(sql.statement, "select id from person where created_at > ?")
     assertEquals(sql.params.size, 1)
-
-    val mock: PreparedStatement = Mockito.mock(classOf[PreparedStatement])
-    sql.params.head.bind(mock, 1)
-    Mockito.verify(mock).setTimestamp(1, java.sql.Timestamp.from(Instant.ofEpochMilli(0)))
   }
 
   test("Bind Option[T]") {
@@ -123,14 +88,6 @@ class ParameterBinderTest extends FunSuite:
     val sql = sql"select id from person where id = $id1 or id = $id2"
     assertEquals(sql.statement, "select id from person where id = ? or id = ?")
     assertEquals(sql.params.size, 2)
-
-    val mock1: PreparedStatement = Mockito.mock(classOf[PreparedStatement])
-    sql.params.head.bind(mock1, 1)
-    Mockito.verify(mock1).setInt(1, 1)
-
-    val mock2: PreparedStatement = Mockito.mock(classOf[PreparedStatement])
-    sql.params(1).bind(mock2, 1)
-    Mockito.verify(mock2).setInt(1, null.asInstanceOf[Int])
   }
 
   test("Bind Some[T]") {
@@ -138,10 +95,6 @@ class ParameterBinderTest extends FunSuite:
     val sql = sql"select id from person where id = $id"
     assertEquals(sql.statement, "select id from person where id = ?")
     assertEquals(sql.params.size, 1)
-
-    val mock: PreparedStatement = Mockito.mock(classOf[PreparedStatement])
-    sql.params.head.bind(mock, 1)
-    Mockito.verify(mock).setInt(1, 1)
   }
 
   test("Bind None") {
@@ -149,8 +102,4 @@ class ParameterBinderTest extends FunSuite:
     val sql = sql"select id from person where id = $id"
     assertEquals(sql.statement, "select id from person where id = ?")
     assertEquals(sql.params.size, 1)
-
-    val mock: PreparedStatement = Mockito.mock(classOf[PreparedStatement])
-    sql.params.head.bind(mock, 1)
-    Mockito.verify(mock).setObject(1, null)
   }

@@ -11,7 +11,6 @@ import cats.effect._
 import cats.effect._
 import cats.effect.implicits._
 import cats.effect.unsafe.implicits.global
-import java.sql.Connection
 import nyanda.syntax._
 import org.h2.jdbcx.JdbcDataSource
 
@@ -47,7 +46,7 @@ class CatsEffectTest extends FunSuite:
     } yield Person(id, name)
   }
 
-  def ddl(conn: Connection): IO[Int] =
+  def ddl(conn: Connection[IO]): IO[Int] =
     update(sql"""
       create table if not exists person(
         id integer not null,
@@ -56,9 +55,9 @@ class CatsEffectTest extends FunSuite:
       )
     """)(conn)
 
-  def truncate(conn: Connection): IO[Int] = update(sql"truncate table person")(conn)
+  def truncate(conn: Connection[IO]): IO[Int] = update(sql"truncate table person")(conn)
 
-  def insert(people: List[Person]): Kleisli[IO, Connection, List[Int]] =
+  def insert(people: List[Person]): Kleisli[IO, Connection[IO], List[Int]] =
     people.traverse { p =>
       update(sql"insert into person (id, name) values (${p.id}, ${p.name})")
     }

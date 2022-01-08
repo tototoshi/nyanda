@@ -11,12 +11,10 @@ trait ResultSet[F[_]]:
 
 object ResultSet:
 
-  def apply[F[_]: Sync](resultSet: => java.sql.ResultSet): ResultSet[F] =
-    val rs = Sync[F].delay(resultSet)
-
+  def apply[F[_]: Sync](rs: java.sql.ResultSet): ResultSet[F] =
     new ResultSet[F] {
-      def next(): F[Boolean] = rs.map(_.next())
-      def getInt(columnLabel: String): F[Int] = rs.map(_.getInt(columnLabel))
-      def getString(columnLabel: String): F[String] = rs.map(_.getString(columnLabel))
+      def next(): F[Boolean] = Sync[F].blocking(rs.next())
+      def getInt(columnLabel: String): F[Int] = Sync[F].blocking(rs.getInt(columnLabel))
+      def getString(columnLabel: String): F[String] = Sync[F].blocking(rs.getString(columnLabel))
 
     }

@@ -8,7 +8,6 @@ import cats.implicits._
 import cats.effect._
 import cats.effect.kernel.Resource
 import cats.effect.std.Console
-import java.sql.{Connection, ResultSet}
 import javax.sql.DataSource
 import org.h2.jdbcx.JdbcDataSource
 
@@ -34,7 +33,7 @@ object Main extends IOApp:
       person3
     )
 
-  def queryGroup[F[_]: Sync: Console]: Kleisli[F, Connection, (Option[Person], Seq[Person])] =
+  def queryGroup[F[_]: Sync: Console]: Kleisli[F, Connection[F], (Option[Person], Seq[Person])] =
     val db: DB[F] = DB[F]
     import db._
 

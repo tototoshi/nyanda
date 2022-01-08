@@ -1,11 +1,9 @@
 package nyanda
 
-import java.sql.PreparedStatement
-
-trait ParameterBinder:
-  def bind(statement: PreparedStatement, index: Int): Unit
+trait ParameterBinder[F[_]]:
+  def bind(statement: PreparedStatement[F], index: Int): F[Unit]
 
 object ParameterBinder:
-  def apply(fn: (PreparedStatement, Int) => Unit): ParameterBinder = new ParameterBinder {
-    def bind(statement: PreparedStatement, index: Int): Unit = fn(statement, index)
+  def apply[F[_]](fn: (PreparedStatement[F], Int) => F[Unit]): ParameterBinder[F] = new ParameterBinder[F] {
+    def bind(statement: PreparedStatement[F], index: Int): F[Unit] = fn(statement, index)
   }

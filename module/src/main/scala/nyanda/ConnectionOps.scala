@@ -3,32 +3,24 @@ package nyanda
 import cats._
 import cats.implicits._
 import cats.effect.Sync
-import java.sql.Connection
-import java.sql.PreparedStatement
 
-class ConnectionOps[F[_]: Sync: FlatMap](connection: Connection):
+class ConnectionOps[F[_]: Sync](connection: Connection[F]):
 
-  def query[A](sql: SQL): F[ResultSet[F]] =
+  def query[A](sql: SQL[F]): F[ResultSet[F]] =
     for {
-      s <- prepareStatement(sql.statement)
+      s <- connection.prepareStatement(sql.statement)
       _ <- bindParams(sql, s)
-      rs <- executeQuery(s)
+      rs <- s.executeQuery()
     } yield rs
 
-  def update(sql: SQL): F[Int] =
+  def update(sql: SQL[F]): F[Int] =
     for {
-      s <- prepareStatement(sql.statement)
+      s <- connection.prepareStatement(sql.statement)
       _ <- bindParams(sql, s)
-      result <- executeUpdate(s)
+      result <- s.executeUpdate()
     } yield result
 
-  private def prepareStatement(s: String): F[PreparedStatement] = Sync[F].blocking(connection.prepareStatement(s))
-
-  private def bindParams(sql: SQL, s: PreparedStatement): F[Unit] = Sync[F].blocking {
-    sql.params.zipWithIndex.foreach { case (p, index) => p.bind(s, index + 1) }
-  }
-
-  private def executeQuery(s: PreparedStatement): F[ResultSet[F]] =
-    Sync[F].delay(s.executeQuery()).map(rs => ResultSet[F](rs))
-
-  private def executeUpdate(s: PreparedStatement): F[Int] = Sync[F].blocking(s.executeUpdate())
+  private def bindParams(sql: SQL[F], s: PreparedStatement[F]): F[Seq[Unit]] =
+    sql.params.zipWithIndex.traverse { case (p, index) =>
+      p.bind(s, index + 1)
+    }

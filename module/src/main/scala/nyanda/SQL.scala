@@ -1,3 +1,3 @@
 package nyanda
 
-case class SQL(statement: String, params: Seq[ParameterBinder])
+case class SQL[F[_]](statement: String, params: Seq[ParameterBinder[F]])

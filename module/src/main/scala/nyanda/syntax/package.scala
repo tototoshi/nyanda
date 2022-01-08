@@ -2,4 +2,4 @@ package nyanda
 
 import nyanda.syntax._
 
-package object syntax extends DataSourceSyntax with SQLSyntax
+package object syntax extends DataSourceSyntax
