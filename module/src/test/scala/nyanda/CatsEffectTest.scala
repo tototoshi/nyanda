@@ -7,13 +7,14 @@ import cats.data.Kleisli
 import cats.syntax._
 import cats.implicits._
 import cats.effect._
-import cats.effect._
 import cats.effect.implicits._
 import cats.effect.unsafe.implicits.global
-import nyanda.syntax._
 import org.h2.jdbcx.JdbcDataSource
 
 class CatsEffectTest extends FunSuite:
+
+  private val dsl: Dsl[IO] = Dsl[IO]
+  import dsl.{_, given}
 
   val dataSource =
     val ds = new JdbcDataSource()
@@ -34,9 +35,6 @@ class CatsEffectTest extends FunSuite:
       person2,
       person3
     )
-
-  private val db: DB[IO] = DB[IO]
-  import db.{_, given}
 
   given ResultSetRead[IO, Person] = ResultSetRead {
     val id = get[Int]("id")

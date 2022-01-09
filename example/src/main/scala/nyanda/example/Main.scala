@@ -34,7 +34,7 @@ object Main extends IOApp:
     )
 
   def queryGroup[F[_]: Sync: Console]: Kleisli[F, Connection[F], (Option[Person], Seq[Person])] =
-    val db: DB[F] = DB[F]
+    val db: Dsl[F] = Dsl[F]
     import db.{_, given}
 
     val personGet = (get[Int]("id"), get[String]("name")).mapN((id, s) => Person(id, s))
