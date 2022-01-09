@@ -17,7 +17,7 @@ import cats.effect.IO
 class ParameterBinderTest extends FunSuite:
 
   private val db: DB[IO] = DB[IO]
-  import db._
+  import db.{_, given}
 
   test("Bind Int") {
     val id = 1

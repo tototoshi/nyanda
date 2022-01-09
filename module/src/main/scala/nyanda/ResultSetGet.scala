@@ -25,21 +25,17 @@ trait ResultSetGetInstances[F[_]: Functor]:
         fa.get(column).map(f)
     }
 
-  implicit def stringGet: ResultSetGet[F, String] = ResultSetGet { column => rs =>
-    rs.getString(column)
-  }
+  given ResultSetGet[F, String] with
+    def get(column: String) = Kleisli(_.getString(column))
 
-  implicit def intGet: ResultSetGet[F, Int] = ResultSetGet { column => rs =>
-    rs.getInt(column)
-  }
+  given ResultSetGet[F, Int] with
+    def get(column: String) = Kleisli(_.getInt(column))
 
-  implicit def longGet: ResultSetGet[F, Long] = ResultSetGet { column => rs =>
-    rs.getLong(column)
-  }
+  given ResultSetGet[F, Long] with
+    def get(column: String) = Kleisli(_.getLong(column))
 
-  implicit def shortGet: ResultSetGet[F, Short] = ResultSetGet { column => rs =>
-    rs.getShort(column)
-  }
+  given ResultSetGet[F, Short] with
+    def get(column: String) = Kleisli(_.getShort(column))
 
-  implicit def optionGet[T](implicit g: ResultSetGet[F, T]): ResultSetGet[F, Option[T]] =
+  given [T](using g: ResultSetGet[F, T]): ResultSetGet[F, Option[T]] =
     g.map(Option.apply)

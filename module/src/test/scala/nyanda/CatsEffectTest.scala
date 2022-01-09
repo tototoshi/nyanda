@@ -2,7 +2,6 @@ package nyanda
 
 import munit.FunSuite
 import javax.sql.DataSource
-import java.sql.ResultSet
 import cats._
 import cats.data.Kleisli
 import cats.syntax._
@@ -37,9 +36,9 @@ class CatsEffectTest extends FunSuite:
     )
 
   private val db: DB[IO] = DB[IO]
-  import db._
+  import db.{_, given}
 
-  implicit def reader2: ResultSetRead[IO, Person] = ResultSetRead {
+  given ResultSetRead[IO, Person] = ResultSetRead {
     val id = get[Int]("id")
     val name = get[String]("name")
     val nickname = get[Option[String]]("nickname")
