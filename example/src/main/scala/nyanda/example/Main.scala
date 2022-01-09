@@ -39,7 +39,7 @@ object Main extends IOApp:
 
     val personGet = (get[Int]("id"), get[String]("name")).mapN((id, s) => Person(id, s))
 
-    implicit def reader: ResultSetRead[F, Person] = ResultSetRead(personGet)
+    given ResultSetRead[F, Person] = ResultSetRead(personGet)
 
     for {
       _ <- update(sql"""
