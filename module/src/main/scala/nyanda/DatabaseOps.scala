@@ -14,6 +14,6 @@ trait DatabaseOps[F[_]: Sync]:
     new ConnectionOps[F](conn).query(sql)
   }
 
-  def as[A](implicit g: ResultSetRead[F, A]): Kleisli[F, ResultSet[F], A] = Kleisli(g.read)
+  def as[A](using g: ResultSetRead[F, A]): Kleisli[F, ResultSet[F], A] = Kleisli(g.read)
 
-  def get[A](column: String)(implicit g: ResultSetGet[F, A]): Kleisli[F, ResultSet[F], A] = g.get(column)
+  def get[A](column: String)(using g: ResultSetGet[F, A]): Kleisli[F, ResultSet[F], A] = g.get(column)

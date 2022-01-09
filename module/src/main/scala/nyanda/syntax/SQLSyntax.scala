@@ -17,5 +17,5 @@ trait SQLSyntax[F[_]]:
       )
     }
 
-  implicit def toParameterBinder[A](value: A)(using ParameterBind[F, A]): ParameterBinder[F] =
-    ParameterBinder[F, A](value)
+  given [A](using ParameterBind[F, A]): Conversion[A, ParameterBinder[F]] with
+    def apply(value: A): ParameterBinder[F] = ParameterBinder[F, A](value)
