@@ -8,7 +8,7 @@ trait DB[F[_]]
     extends ResultSetGetInstances[F]
     with ResultSetReadInstances[F]
     with SQLSyntax[F]
-    with ToParameterBinderInstances[F] {
+    with ParameterBindableInstances[F] {
   def update(sql: SQL[F]): Kleisli[F, Connection[F], Int]
   def query[A](sql: SQL[F]): Kleisli[F, Connection[F], ResultSet[F]]
   def as[A](implicit g: ResultSetRead[F, A]): Kleisli[F, ResultSet[F], A]

@@ -17,5 +17,5 @@ trait SQLSyntax[F[_]]:
       )
     }
 
-  implicit def toParameterBinder[A](value: A)(implicit f: ToParameterBinder[F, A]): ParameterBinder[F] =
+  implicit def toParameterBinder[A](value: A)(implicit f: ParameterBindable[F, A]): ParameterBinder[F] =
     f.binder(value)
