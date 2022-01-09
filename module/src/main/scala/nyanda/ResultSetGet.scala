@@ -14,10 +14,18 @@ object ResultSetGet:
 
 trait ResultSetGetInstances[F[_]: Sync]:
 
-  implicit def stringGet: ResultSetGet[F, String] = ResultSetGet[F, String] { column => rs =>
+  implicit def stringGet: ResultSetGet[F, String] = ResultSetGet { column => rs =>
     rs.getString(column)
   }
 
-  implicit def intGet: ResultSetGet[F, Int] = ResultSetGet[F, Int] { column => rs =>
+  implicit def intGet: ResultSetGet[F, Int] = ResultSetGet { column => rs =>
     rs.getInt(column)
+  }
+
+  implicit def longGet: ResultSetGet[F, Long] = ResultSetGet { column => rs =>
+    rs.getLong(column)
+  }
+
+  implicit def shortGet: ResultSetGet[F, Short] = ResultSetGet { column => rs =>
+    rs.getShort(column)
   }
