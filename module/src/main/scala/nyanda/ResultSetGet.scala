@@ -5,23 +5,25 @@ import cats.implicits._
 import cats.data.Kleisli
 import cats.effect.Sync
 
-trait ResultSetGet[F[_]: Functor, A]:
-  self =>
-
+trait ResultSetGet[F[_], A]:
   def get(column: String): Kleisli[F, ResultSet[F], A]
 
-  def map[B](f: A => B): ResultSetGet[F, B] = new ResultSetGet[F, B] {
-    def get(column: String): Kleisli[F, ResultSet[F], B] =
-      self.get(column).map(f)
-  }
-
 object ResultSetGet:
-  def apply[F[_]: Functor, A](f: String => ResultSet[F] => F[A]): ResultSetGet[F, A] =
+
+  def apply[F[_], A](f: String => ResultSet[F] => F[A]): ResultSetGet[F, A] =
     new ResultSetGet[F, A] {
       def get(column: String): Kleisli[F, ResultSet[F], A] = Kleisli(f(column))
     }
 
-trait ResultSetGetInstances[F[_]: Sync]:
+trait ResultSetGetInstances[F[_]: Functor]:
+
+  type ResultSetGetF[A] = ResultSetGet[F, A]
+
+  given Functor[ResultSetGetF] with
+    def map[A, B](fa: ResultSetGetF[A])(f: A => B): ResultSetGetF[B] = new ResultSetGet[F, B] {
+      def get(column: String): Kleisli[F, ResultSet[F], B] =
+        fa.get(column).map(f)
+    }
 
   implicit def stringGet: ResultSetGet[F, String] = ResultSetGet { column => rs =>
     rs.getString(column)
