@@ -46,7 +46,7 @@ class CatsEffectTest extends FunSuite:
     (id, name, nickname).mapN(Person.apply)
   }
 
-  def ddl: Kleisli[IO, Connection[IO], Int] = update(sql"""
+  def ddl = update(sql"""
       create table person(
         id integer not null,
         name varchar(32) not null,
@@ -55,12 +55,16 @@ class CatsEffectTest extends FunSuite:
       )
       """)
 
-  def drop: Kleisli[IO, Connection[IO], Int] = update(sql"drop table person")
+  def drop = update(sql"drop table person")
 
-  def insert(people: List[Person]): Kleisli[IO, Connection[IO], List[Int]] =
-    people.traverse { p =>
-      update(sql"insert into person (id, name, nickname) values (${p.id}, ${p.name}, ${p.nickname})")
-    }
+  def insertAll(people: List[Person]) = people.traverse(insert)
+
+  def insert(p: Person) =
+    update(sql"insert into person (id, name, nickname) values (${p.id}, ${p.name}, ${p.nickname})")
+
+  def findById(id: Int) = query(sql"select id, name, nickname from person where id = ${id}") >>> as[Option[Person]]
+
+  def findAll = query(sql"select id, name, nickname from person") >>> as[Seq[Person]]
 
   override def beforeEach(context: BeforeEach): Unit =
     dataSource
@@ -79,11 +83,9 @@ class CatsEffectTest extends FunSuite:
     val program: IO[(Option[Person], Seq[Person])] =
       dataSource.transaction[IO].use {
         (for {
-          _ <- people.traverse { p =>
-            update(sql"insert into person (id, name, nickname) values (${p.id}, ${p.name}, ${p.nickname})")
-          }
-          result1 <- query(sql"select id, name, nickname from person where id = ${1}") >>> as[Option[Person]]
-          result2 <- query(sql"select id, name, nickname from person") >>> as[Seq[Person]]
+          _ <- insertAll(people)
+          result1 <- findById(1)
+          result2 <- findAll
         } yield (result1, result2)).run
       }
 
@@ -94,14 +96,14 @@ class CatsEffectTest extends FunSuite:
     val program1: IO[Boolean] =
       dataSource
         .autoCommit[IO]
-        .use { conn => insert(people)(conn) *> IO.raiseError(new RuntimeException("error")) }
+        .use { conn => insertAll(people)(conn) *> IO.raiseError(new RuntimeException("error")) }
         .handleError(e => true)
 
     assertEquals(program1.unsafeRunSync(), true)
 
     val program2 = dataSource
       .readOnly[IO]
-      .use((query(sql"select id, name, nickname from person") >>> as[Seq[Person]]).run)
+      .use(findAll.run)
 
     assertEquals(program2.unsafeRunSync(), people)
   }
@@ -110,14 +112,14 @@ class CatsEffectTest extends FunSuite:
     val program1: IO[List[Int]] =
       dataSource
         .transaction[IO]
-        .use(insert(people).run)
+        .use(insertAll(people).run)
 
     program1.unsafeRunSync()
 
     val program2 =
       dataSource
         .readOnly[IO]
-        .use((query(sql"select id, name, nickname from person") >>> as[Seq[Person]]).run)
+        .use(findAll.run)
 
     assertEquals(program2.unsafeRunSync(), people)
   }
@@ -126,7 +128,7 @@ class CatsEffectTest extends FunSuite:
     val program1: IO[Boolean] =
       dataSource
         .transaction[IO]
-        .use { conn => insert(people).run(conn) *> IO.raiseError(new RuntimeException("error")) }
+        .use { conn => insertAll(people).run(conn) *> IO.raiseError(new RuntimeException("error")) }
         .handleError(e => true)
 
     assertEquals(program1.unsafeRunSync(), true)
@@ -134,7 +136,7 @@ class CatsEffectTest extends FunSuite:
     val program2 =
       dataSource
         .readOnly[IO]
-        .use((query(sql"select id, name, nickname from person where id = ${1}") >>> as[Option[Person]]).run)
+        .use(findById(1).run)
 
     assertEquals(program2.unsafeRunSync(), None)
   }
