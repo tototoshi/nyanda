@@ -19,7 +19,7 @@ lazy val module = project
     publishingSettings,
     name := "nyanda",
     libraryDependencies ++= Seq(
-      "org.typelevel" %% "cats-effect" % "3.3.3"
+      "org.typelevel" %% "cats-effect" % "3.3.4"
     )
   )
 
@@ -80,4 +80,3 @@ val _pomExtra =
       <url>https://tototoshi.github.io</url>
     </developer>
   </developers>
-
