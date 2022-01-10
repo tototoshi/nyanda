@@ -41,10 +41,15 @@ trait ParameterBindInstances[F[_]]:
   given ParameterBind[F, java.time.LocalDateTime] =
     ParameterBind.from(java.time.ZonedDateTime.of(_, java.time.ZoneId.systemDefault))
 
-  given [T](using b: ParameterBind[F, T]): ParameterBind[F, Option[T]] with
-    def bind(statement: PreparedStatement[F], index: Int, value: Option[T]): F[Unit] =
-      b.bind(statement, index, value.orNull.asInstanceOf[T])
-
-  given ParameterBind[F, None.type] with
-    def bind(statement: PreparedStatement[F], index: Int, value: None.type): F[Unit] =
+  given ParameterBind[F, Null] with
+    def bind(statement: PreparedStatement[F], index: Int, value: Null): F[Unit] =
       statement.setObject(index, null)
+
+  given ParameterBind[F, None.type] = ParameterBind.from(_ => null)
+
+  given [T](using s: ParameterBind[F, T], n: ParameterBind[F, Null]): ParameterBind[F, Option[T]] with
+    def bind(statement: PreparedStatement[F], index: Int, value: Option[T]): F[Unit] =
+      value match {
+        case Some(v) => s.bind(statement, index, v)
+        case None => n.bind(statement, index, null)
+      }
