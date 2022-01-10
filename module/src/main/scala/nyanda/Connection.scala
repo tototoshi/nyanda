@@ -14,7 +14,7 @@ trait Connection[F[_]]:
 
 object Connection:
 
-  def apply[F[_]: Sync](conn: java.sql.Connection): Connection[F] = new Connection[F] {
+  def apply[F[_]: Sync](conn: java.sql.Connection): Connection[F] = new Connection[F]:
     def prepareStatement(sql: String): F[PreparedStatement[F]] =
       Sync[F].blocking(conn.prepareStatement(sql)).map(s => PreparedStatement[F](s))
     def setReadOnly(readOnly: Boolean): F[Unit] =
@@ -27,4 +27,3 @@ object Connection:
       Sync[F].blocking(conn.commit())
     def rollback(): F[Unit] =
       Sync[F].blocking(conn.rollback())
-  }

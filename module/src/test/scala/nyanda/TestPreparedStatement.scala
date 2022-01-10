@@ -1,6 +1,6 @@
 package nyanda
 
-trait MockPreparedStatement[F[_]] extends PreparedStatement[F] {
+trait MockPreparedStatement[F[_]] extends PreparedStatement[F]:
   def executeQuery(): F[nyanda.ResultSet[F]] = ???
   def executeUpdate(): F[Int] = ???
   def setArray(parameterIndex: Int, x: java.sql.Array): F[Unit] = ???
@@ -17,4 +17,3 @@ trait MockPreparedStatement[F[_]] extends PreparedStatement[F] {
   def setString(parameterIndex: Int, x: String): F[Unit] = ???
   def setTimestamp(parameterIndex: Int, x: java.sql.Timestamp): F[Unit] = ???
   def setTime(parameterIndex: Int, x: java.sql.Time): F[Unit] = ???
-}

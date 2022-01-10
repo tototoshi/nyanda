@@ -64,14 +64,14 @@ object Main extends IOApp:
   def personDao[F[_]: Sync] = new PersonDao[F] {}
 
   def queryGroup[F[_]: Sync: Console]: Query[F, (Option[Person], Seq[Person])] =
-    for {
+    for
       _ <- personDao.createTable
       _ <- people.traverse(personDao.insert)
       result1 <- personDao.findById(1)
       _ <- Kleisli.liftF(Console[F].println(result1))
       result2 <- personDao.findAll
       _ <- Kleisli.liftF(Console[F].println(result2))
-    } yield (result1, result2)
+    yield (result1, result2)
 
   override def run(args: List[String]): IO[ExitCode] =
     transactor.transaction.use(queryGroup[IO].run).map(_ => ExitCode.Success)

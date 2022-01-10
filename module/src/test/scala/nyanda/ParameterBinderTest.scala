@@ -22,7 +22,7 @@ class ParameterBinderTest extends FunSuite with Dsl[IO]:
     assertEquals(sql.statement, "select id from person where id = ?")
     assertEquals(sql.params.size, 1)
 
-    val program = for {
+    val program = for
       ref <- Ref[IO].of(0, 0)
       stmt = new MockPreparedStatement[IO] {
         override def setInt(parameterIndex: Int, x: Int): IO[Unit] = ref.update(_ => (parameterIndex, x))
@@ -32,7 +32,7 @@ class ParameterBinderTest extends FunSuite with Dsl[IO]:
         assertEquals(parameterIndex, 1)
         assertEquals(x, 100)
       }
-    } yield ()
+    yield ()
 
     program.unsafeRunSync()
   }
@@ -43,7 +43,7 @@ class ParameterBinderTest extends FunSuite with Dsl[IO]:
     assertEquals(sql.statement, "select id from person where id = ?")
     assertEquals(sql.params.size, 1)
 
-    val program = for {
+    val program = for
       ref <- Ref[IO].of(0, 0.toShort)
       stmt = new MockPreparedStatement[IO] {
         override def setShort(parameterIndex: Int, x: Short): IO[Unit] = ref.update(_ => (parameterIndex, x))
@@ -53,7 +53,7 @@ class ParameterBinderTest extends FunSuite with Dsl[IO]:
         assertEquals(parameterIndex, 1)
         assertEquals(x, id)
       }
-    } yield ()
+    yield ()
 
     program.unsafeRunSync()
   }
@@ -64,7 +64,7 @@ class ParameterBinderTest extends FunSuite with Dsl[IO]:
     assertEquals(sql.statement, "select id from person where id = ?")
     assertEquals(sql.params.size, 1)
 
-    val program = for {
+    val program = for
       ref <- Ref[IO].of(0, 0.toLong)
       stmt = new MockPreparedStatement[IO] {
         override def setLong(parameterIndex: Int, x: Long): IO[Unit] = ref.update(_ => (parameterIndex, x))
@@ -74,7 +74,7 @@ class ParameterBinderTest extends FunSuite with Dsl[IO]:
         assertEquals(parameterIndex, 1)
         assertEquals(x, id)
       }
-    } yield ()
+    yield ()
 
     program.unsafeRunSync()
   }
@@ -85,7 +85,7 @@ class ParameterBinderTest extends FunSuite with Dsl[IO]:
     assertEquals(sql.statement, "select id from person where id = ?")
     assertEquals(sql.params.size, 1)
 
-    val program = for {
+    val program = for
       ref <- Ref[IO].of(0, "")
       stmt = new MockPreparedStatement[IO] {
         override def setString(parameterIndex: Int, x: String): IO[Unit] = ref.update(_ => (parameterIndex, x))
@@ -95,7 +95,7 @@ class ParameterBinderTest extends FunSuite with Dsl[IO]:
         assertEquals(parameterIndex, 1)
         assertEquals(x, id)
       }
-    } yield ()
+    yield ()
 
     program.unsafeRunSync()
   }
@@ -106,7 +106,7 @@ class ParameterBinderTest extends FunSuite with Dsl[IO]:
     assertEquals(sql.statement, "select id from person where created_at > ?")
     assertEquals(sql.params.size, 1)
 
-    val program = for {
+    val program = for
       ref <- Ref[IO].of(0, null.asInstanceOf[java.sql.Timestamp])
       stmt = new MockPreparedStatement[IO] {
         override def setTimestamp(parameterIndex: Int, x: java.sql.Timestamp): IO[Unit] =
@@ -117,7 +117,7 @@ class ParameterBinderTest extends FunSuite with Dsl[IO]:
         assertEquals(parameterIndex, 1)
         assertEquals(x, createdAt)
       }
-    } yield ()
+    yield ()
 
     program.unsafeRunSync()
   }
@@ -128,7 +128,7 @@ class ParameterBinderTest extends FunSuite with Dsl[IO]:
     assertEquals(sql.statement, "select id from person where created_at > ?")
     assertEquals(sql.params.size, 1)
 
-    val program = for {
+    val program = for
       ref <- Ref[IO].of(0, null.asInstanceOf[java.sql.Timestamp])
       stmt = new MockPreparedStatement[IO] {
         override def setTimestamp(parameterIndex: Int, x: java.sql.Timestamp): IO[Unit] =
@@ -139,7 +139,7 @@ class ParameterBinderTest extends FunSuite with Dsl[IO]:
         assertEquals(parameterIndex, 1)
         assertEquals(x, new java.sql.Timestamp(createdAt.getTime))
       }
-    } yield ()
+    yield ()
 
     program.unsafeRunSync()
   }
@@ -150,7 +150,7 @@ class ParameterBinderTest extends FunSuite with Dsl[IO]:
     assertEquals(sql.statement, "select id from person where created_at > ?")
     assertEquals(sql.params.size, 1)
 
-    val program = for {
+    val program = for
       ref <- Ref[IO].of(0, null.asInstanceOf[java.sql.Timestamp])
       stmt = new MockPreparedStatement[IO] {
         override def setTimestamp(parameterIndex: Int, x: java.sql.Timestamp): IO[Unit] =
@@ -161,7 +161,7 @@ class ParameterBinderTest extends FunSuite with Dsl[IO]:
         assertEquals(parameterIndex, 1)
         assertEquals(x, java.sql.Timestamp.from(createdAt))
       }
-    } yield ()
+    yield ()
 
     program.unsafeRunSync()
   }
@@ -172,7 +172,7 @@ class ParameterBinderTest extends FunSuite with Dsl[IO]:
     assertEquals(sql.statement, "select id from person where created_at > ?")
     assertEquals(sql.params.size, 1)
 
-    val program = for {
+    val program = for
       ref <- Ref[IO].of(0, null.asInstanceOf[java.sql.Timestamp])
       stmt = new MockPreparedStatement[IO] {
         override def setTimestamp(parameterIndex: Int, x: java.sql.Timestamp): IO[Unit] =
@@ -183,7 +183,7 @@ class ParameterBinderTest extends FunSuite with Dsl[IO]:
         assertEquals(parameterIndex, 1)
         assertEquals(x, java.sql.Timestamp.from(ZonedDateTime.of(createdAt, ZoneId.systemDefault).toInstant))
       }
-    } yield ()
+    yield ()
 
     program.unsafeRunSync()
   }
@@ -194,7 +194,7 @@ class ParameterBinderTest extends FunSuite with Dsl[IO]:
     assertEquals(sql.statement, "select id from person where created_at > ?")
     assertEquals(sql.params.size, 1)
 
-    val program = for {
+    val program = for
       ref <- Ref[IO].of(0, null.asInstanceOf[java.sql.Timestamp])
       stmt = new MockPreparedStatement[IO] {
         override def setTimestamp(parameterIndex: Int, x: java.sql.Timestamp): IO[Unit] =
@@ -205,7 +205,7 @@ class ParameterBinderTest extends FunSuite with Dsl[IO]:
         assertEquals(parameterIndex, 1)
         assertEquals(x, java.sql.Timestamp.from(createdAt.toInstant))
       }
-    } yield ()
+    yield ()
 
     program.unsafeRunSync()
   }
@@ -217,7 +217,7 @@ class ParameterBinderTest extends FunSuite with Dsl[IO]:
     assertEquals(sql.statement, "select id from person where id = ? or id = ?")
     assertEquals(sql.params.size, 2)
 
-    val program = for {
+    val program = for
       ref <- Ref[IO].of(Seq.empty[(Int, Any)])
       stmt = new MockPreparedStatement[IO] {
         override def setInt(parameterIndex: Int, x: Int): IO[Unit] =
@@ -230,7 +230,7 @@ class ParameterBinderTest extends FunSuite with Dsl[IO]:
       _ <- ref.get.map { value =>
         assertEquals(Seq((1, 1), (2, null.asInstanceOf[Any])), value)
       }
-    } yield ()
+    yield ()
 
     program.unsafeRunSync()
   }
@@ -241,7 +241,7 @@ class ParameterBinderTest extends FunSuite with Dsl[IO]:
     assertEquals(sql.statement, "select id from person where id = ?")
     assertEquals(sql.params.size, 1)
 
-    val program = for {
+    val program = for
       ref <- Ref[IO].of(0, 0)
       stmt = new MockPreparedStatement[IO] {
         override def setInt(parameterIndex: Int, x: Int): IO[Unit] =
@@ -252,7 +252,7 @@ class ParameterBinderTest extends FunSuite with Dsl[IO]:
         assertEquals(parameterIndex, 1)
         assertEquals(Some(x), id)
       }
-    } yield ()
+    yield ()
 
     program.unsafeRunSync()
   }
@@ -263,7 +263,7 @@ class ParameterBinderTest extends FunSuite with Dsl[IO]:
     assertEquals(sql.statement, "select id from person where id = ?")
     assertEquals(sql.params.size, 1)
 
-    val program = for {
+    val program = for
       ref <- Ref[IO].of(0, new java.lang.Object())
       stmt = new MockPreparedStatement[IO] {
         override def setObject(parameterIndex: Int, x: java.lang.Object): IO[Unit] =
@@ -274,7 +274,7 @@ class ParameterBinderTest extends FunSuite with Dsl[IO]:
         assertEquals(parameterIndex, 1)
         assertEquals(x, null)
       }
-    } yield ()
+    yield ()
 
     program.unsafeRunSync()
   }

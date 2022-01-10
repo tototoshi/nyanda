@@ -7,6 +7,6 @@ trait ParameterBinder[F[_]]:
 
 object ParameterBinder:
 
-  def apply[F[_], T](value: T)(using b: ParameterBind[F, T]) = new ParameterBinder[F] {
-    def bind(statement: PreparedStatement[F], index: Int): F[Unit] = b.bind(statement, index, value)
-  }
+  def apply[F[_], T](value: T)(using b: ParameterBind[F, T]) =
+    new ParameterBinder[F]:
+      def bind(statement: PreparedStatement[F], index: Int): F[Unit] = b.bind(statement, index, value)

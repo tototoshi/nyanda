@@ -25,7 +25,7 @@ trait PreparedStatement[F[_]]:
 object PreparedStatement:
 
   def apply[F[_]: Sync](stmt: java.sql.PreparedStatement): PreparedStatement[F] =
-    new PreparedStatement[F] {
+    new PreparedStatement[F]:
       def executeQuery(): F[ResultSet[F]] = Sync[F].blocking(stmt.executeQuery()).map(rs => ResultSet[F](rs))
       def executeUpdate(): F[Int] = Sync[F].blocking(stmt.executeUpdate())
       def setArray(parameterIndex: Int, x: java.sql.Array): F[Unit] =
@@ -56,4 +56,3 @@ object PreparedStatement:
         Sync[F].blocking(stmt.setTime(parameterIndex, x))
       def setTimestamp(parameterIndex: Int, x: java.sql.Timestamp): F[Unit] =
         Sync[F].blocking(stmt.setTimestamp(parameterIndex, x))
-    }

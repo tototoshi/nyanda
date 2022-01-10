@@ -74,11 +74,11 @@ class CatsEffectTest extends FunSuite with Dsl[IO]:
 
     val program: IO[(Option[Person], Seq[Person])] =
       t.transaction.use {
-        (for {
+        (for
           _ <- insertAll(people)
           result1 <- findById(1)
           result2 <- findAll
-        } yield (result1, result2)).run
+        yield (result1, result2)).run
       }
 
     assertEquals(program.unsafeRunSync(), (Some(person1), people))

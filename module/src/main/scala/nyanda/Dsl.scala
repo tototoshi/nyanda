@@ -9,10 +9,9 @@ trait Dsl[F[_]: Sync]
     extends ResultSetGetInstances[F]
     with ResultSetReadInstances[F]
     with ParameterBindInstances[F]
-    with SQLSyntax[F] {
+    with SQLSyntax[F]:
   object DB extends DatabaseOps[F]
   object RS extends ResultSetOps[F]
-}
 
 object Dsl:
   def apply[F[_]: Sync]: Dsl[F] = new Dsl[F] {}
@@ -33,18 +32,18 @@ private[nyanda] trait ResultSetOps[F[_]]:
 private[nyanda] class ConnectionOps[F[_]: Sync](connection: Connection[F]):
 
   def query[A](sql: SQL[F]): F[ResultSet[F]] =
-    for {
+    for
       s <- connection.prepareStatement(sql.statement)
       _ <- bindParams(sql, s)
       rs <- s.executeQuery()
-    } yield rs
+    yield rs
 
   def update(sql: SQL[F]): F[Int] =
-    for {
+    for
       s <- connection.prepareStatement(sql.statement)
       _ <- bindParams(sql, s)
       result <- s.executeUpdate()
-    } yield result
+    yield result
 
   private def bindParams(sql: SQL[F], s: PreparedStatement[F]): F[Seq[Unit]] =
     sql.params.zipWithIndex.traverse { case (p, index) =>
