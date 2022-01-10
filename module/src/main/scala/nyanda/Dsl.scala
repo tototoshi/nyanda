@@ -28,7 +28,7 @@ private[nyanda] trait DatabaseOps[F[_]: Sync]:
 
 private[nyanda] trait ResultSetOps[F[_]]:
 
-  def get[A](column: String)(using g: ResultSetGet[F, A]): Kleisli[F, ResultSet[F], A] = g.get(column)
+  def get[A](column: String)(using g: ResultSetGet[F, A]): Kleisli[F, ResultSet[F], A] = Kleisli(g.get(column))
 
 private[nyanda] class ConnectionOps[F[_]: Sync](connection: Connection[F]):
 
