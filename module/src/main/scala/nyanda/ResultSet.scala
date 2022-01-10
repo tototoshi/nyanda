@@ -11,6 +11,7 @@ trait ResultSet[F[_]]:
   def getShort(columnLabel: String): F[Short]
   def getString(columnLabel: String): F[String]
   def getTimestamp(columnLabel: String): F[java.sql.Timestamp]
+  def getDate(columnLabel: String): F[java.sql.Date]
 
 object ResultSet:
 
@@ -22,4 +23,5 @@ object ResultSet:
       def getShort(columnLabel: String): F[Short] = Sync[F].blocking(rs.getShort(columnLabel))
       def getString(columnLabel: String): F[String] = Sync[F].blocking(rs.getString(columnLabel))
       def getTimestamp(columnLabel: String): F[java.sql.Timestamp] = Sync[F].blocking(rs.getTimestamp(columnLabel))
+      def getDate(columnLabel: String): F[java.sql.Date] = Sync[F].blocking(rs.getDate(columnLabel))
     }
