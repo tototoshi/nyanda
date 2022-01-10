@@ -19,7 +19,7 @@ object Dsl:
 
 private[nyanda] trait DatabaseOps[F[_]: Sync]:
 
-  def update(sql: SQL[F]): QueryF[F, Int] = Kleisli { conn =>
+  def update(sql: SQL[F]): Query[F, Int] = Kleisli { conn =>
     new ConnectionOps[F](conn).update(sql)
   }
 

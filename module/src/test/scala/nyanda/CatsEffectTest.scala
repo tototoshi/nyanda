@@ -48,16 +48,17 @@ class CatsEffectTest extends FunSuite with Dsl[IO]:
       )
       """)
 
-  def drop: Query[Int] = DB.update(sql"drop table person")
+  def drop: Query[IO, Int] = DB.update(sql"drop table person")
 
-  def insertAll(people: List[Person]): Query[List[Int]] = people.traverse(insert)
+  def insertAll(people: List[Person]): Query[IO, List[Int]] = people.traverse(insert)
 
-  def insert(p: Person): Query[Int] =
+  def insert(p: Person): Query[IO, Int] =
     DB.update(sql"insert into person (id, name, nickname) values (${p.id}, ${p.name}, ${p.nickname})")
 
-  def findById(id: Int): Query[Option[Person]] = DB.query(sql"select id, name, nickname from person where id = ${id}")
+  def findById(id: Int): Query[IO, Option[Person]] =
+    DB.query(sql"select id, name, nickname from person where id = ${id}")
 
-  def findAll: Query[Seq[Person]] = DB.query(sql"select id, name, nickname from person")
+  def findAll: Query[IO, Seq[Person]] = DB.query(sql"select id, name, nickname from person")
 
   override def beforeEach(context: BeforeEach): Unit =
     t.autoCommit

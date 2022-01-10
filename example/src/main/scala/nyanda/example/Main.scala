@@ -31,17 +31,17 @@ trait PersonDao[F[_]: Applicative] extends Dsl[F]:
       )
       """
 
-  def createTable: QueryF[F, Int] = DB.update(ddl)
+  def createTable: Query[F, Int] = DB.update(ddl)
 
-  def insert(p: Person): QueryF[F, Int] =
+  def insert(p: Person): Query[F, Int] =
     DB.update(
       sql"insert into person (id, name, nickname, created_at) values (${p.id}, ${p.name}, ${p.nickname}, ${p.createdAt})"
     )
 
-  def findById(id: Int): QueryF[F, Option[Person]] =
+  def findById(id: Int): Query[F, Option[Person]] =
     DB.query(sql"select id, name, nickname, created_at from person where id = ${1}")
 
-  def findAll: QueryF[F, Seq[Person]] = DB.query(sql"select id, name, nickname, created_at from person")
+  def findAll: Query[F, Seq[Person]] = DB.query(sql"select id, name, nickname, created_at from person")
 
 object Main extends IOApp:
 
@@ -63,7 +63,7 @@ object Main extends IOApp:
 
   def personDao[F[_]: Sync] = new PersonDao[F] {}
 
-  def queryGroup[F[_]: Sync: Console]: QueryF[F, (Option[Person], Seq[Person])] =
+  def queryGroup[F[_]: Sync: Console]: Query[F, (Option[Person], Seq[Person])] =
     for {
       _ <- personDao.createTable
       _ <- people.traverse(personDao.insert)

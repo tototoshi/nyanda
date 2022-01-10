@@ -14,10 +14,7 @@ import java.time.ZonedDateTime
 import java.time.LocalDate
 import cats.effect.IO
 
-class ParameterBinderTest extends FunSuite:
-
-  private val dsl = Dsl[IO]
-  import dsl.{_, given}
+class ParameterBinderTest extends FunSuite with Dsl[IO]:
 
   test("Bind Int") {
     val id = 1
