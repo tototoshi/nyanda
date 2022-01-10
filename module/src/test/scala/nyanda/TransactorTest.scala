@@ -9,7 +9,7 @@ import cats.effect.implicits._
 import cats.effect.unsafe.implicits.global
 import org.h2.jdbcx.JdbcDataSource
 
-class CatsEffectTest extends FunSuite with Dsl[IO]:
+class TransactorTest extends FunSuite with Dsl[IO]:
 
   val ds = new JdbcDataSource()
   ds.setUrl("jdbc:h2:mem:effect;DB_CLOSE_DELAY=1")
