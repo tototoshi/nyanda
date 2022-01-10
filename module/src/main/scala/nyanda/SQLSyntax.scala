@@ -1,4 +1,4 @@
-package nyanda.syntax
+package nyanda
 
 import java.sql.Connection
 import javax.sql.DataSource

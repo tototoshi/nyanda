@@ -1,14 +1,12 @@
 package nyanda.example
 
 import nyanda._
-import nyanda.syntax._
 import cats._
 import cats.data.Kleisli
 import cats.implicits._
 import cats.effect._
 import cats.effect.kernel.Resource
 import cats.effect.std.Console
-import javax.sql.DataSource
 import org.h2.jdbcx.JdbcDataSource
 
 case class Person(id: Int, name: String)
@@ -45,20 +43,18 @@ object Main extends IOApp:
     ds.setPassword("")
     ds
 
-  val person1 = Person(1, "Takahashi")
-  val person2 = Person(2, "Suzuki")
-  val person3 = Person(3, "Sato")
+  val transactor = Transactor[IO](dataSource)
 
   val people =
     List(
-      person1,
-      person2,
-      person3
+      Person(1, "Takahashi"),
+      Person(2, "Suzuki"),
+      Person(3, "Sato")
     )
 
   def personDao[F[_]: Sync] = new PersonDao[F] {}
 
-  def queryGroup[F[_]: Sync: Console]: Kleisli[F, Connection[F], (Option[Person], Seq[Person])] =
+  def queryGroup[F[_]: Sync: Console]: QueryF[F, (Option[Person], Seq[Person])] =
     for {
       _ <- personDao.createTable
       _ <- people.traverse(personDao.insert)
@@ -69,7 +65,7 @@ object Main extends IOApp:
     } yield (result1, result2)
 
   override def run(args: List[String]): IO[ExitCode] =
-    dataSource.transaction[IO].use(queryGroup[IO].run).map(_ => ExitCode.Success)
+    transactor.transaction.use(queryGroup[IO].run).map(_ => ExitCode.Success)
 
 // sbt:root> example/run
 // [info] running (fork) nyanda.example.Main

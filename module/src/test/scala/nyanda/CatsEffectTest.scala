@@ -1,9 +1,7 @@
 package nyanda
 
 import munit.FunSuite
-import javax.sql.DataSource
 import cats._
-import cats.data.Kleisli
 import cats.syntax._
 import cats.implicits._
 import cats.effect._
@@ -13,12 +11,12 @@ import org.h2.jdbcx.JdbcDataSource
 
 class CatsEffectTest extends FunSuite with Dsl[IO]:
 
-  val dataSource =
-    val ds = new JdbcDataSource()
-    ds.setUrl("jdbc:h2:mem:effect;DB_CLOSE_DELAY=1")
-    ds.setUser("sa")
-    ds.setPassword("")
-    ds
+  val ds = new JdbcDataSource()
+  ds.setUrl("jdbc:h2:mem:effect;DB_CLOSE_DELAY=1")
+  ds.setUser("sa")
+  ds.setPassword("")
+
+  val t = Transactor[IO](ds)
 
   case class Person(id: Int, name: String, nickname: Option[String])
 
@@ -62,21 +60,19 @@ class CatsEffectTest extends FunSuite with Dsl[IO]:
   def findAll: Query[Seq[Person]] = DB.query(sql"select id, name, nickname from person")
 
   override def beforeEach(context: BeforeEach): Unit =
-    dataSource
-      .autoCommit[IO]
+    t.autoCommit
       .use(ddl.run)
       .unsafeRunSync()
 
   override def afterEach(context: AfterEach): Unit =
-    dataSource
-      .autoCommit[IO]
+    t.autoCommit
       .use(drop.run)
       .unsafeRunSync()
 
   test("Query Tests") {
 
     val program: IO[(Option[Person], Seq[Person])] =
-      dataSource.transaction[IO].use {
+      t.transaction.use {
         (for {
           _ <- insertAll(people)
           result1 <- findById(1)
@@ -89,15 +85,13 @@ class CatsEffectTest extends FunSuite with Dsl[IO]:
 
   test("autoCommit") {
     val program1: IO[Boolean] =
-      dataSource
-        .autoCommit[IO]
+      t.autoCommit
         .use { conn => insertAll(people)(conn) *> IO.raiseError(new RuntimeException("error")) }
         .handleError(e => true)
 
     assertEquals(program1.unsafeRunSync(), true)
 
-    val program2 = dataSource
-      .readOnly[IO]
+    val program2 = t.readOnly
       .use(findAll.run)
 
     assertEquals(program2.unsafeRunSync(), people)
@@ -105,15 +99,13 @@ class CatsEffectTest extends FunSuite with Dsl[IO]:
 
   test("transaction (Success)") {
     val program1: IO[List[Int]] =
-      dataSource
-        .transaction[IO]
+      t.transaction
         .use(insertAll(people).run)
 
     program1.unsafeRunSync()
 
     val program2 =
-      dataSource
-        .readOnly[IO]
+      t.readOnly
         .use(findAll.run)
 
     assertEquals(program2.unsafeRunSync(), people)
@@ -121,16 +113,14 @@ class CatsEffectTest extends FunSuite with Dsl[IO]:
 
   test("transaction (Failure)") {
     val program1: IO[Boolean] =
-      dataSource
-        .transaction[IO]
+      t.transaction
         .use { conn => insertAll(people).run(conn) *> IO.raiseError(new RuntimeException("error")) }
         .handleError(e => true)
 
     assertEquals(program1.unsafeRunSync(), true)
 
     val program2 =
-      dataSource
-        .readOnly[IO]
+      t.readOnly
         .use(findById(1).run)
 
     assertEquals(program2.unsafeRunSync(), None)

@@ -3,7 +3,6 @@ package nyanda
 import cats.implicits._
 import cats.effect.Sync
 import cats.data.Kleisli
-import syntax.SQLSyntax
 
 trait DatabaseOps[F[_]: Sync]:
 
