@@ -4,11 +4,8 @@ import cats._
 import cats.data.Kleisli
 import cats.implicits._
 import cats.effect._
-import scala.collection.mutable.ListBuffer
 
 trait ResultSetRead[F[_], T]:
-  self =>
-
   def read(rs: ResultSet[F]): F[T]
 
 object ResultSetRead:

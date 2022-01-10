@@ -1,22 +1,17 @@
 package nyanda
 
 import munit.FunSuite
-import javax.sql.DataSource
-import org.h2.jdbcx.JdbcDataSource
-import scala.util.Using
-import java.sql.PreparedStatement
-import java.sql.Connection
-import java.time.Instant
 import java.util.Date
+import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.LocalDate
+import java.time.ZoneOffset
 import cats.implicits._
 import cats.effect.{IO, Ref}
 import cats.effect.implicits._
 import cats.effect.unsafe.implicits.global
-import java.time.ZoneOffset
 
 class ParameterBinderTest extends FunSuite with Dsl[IO]:
 

@@ -4,8 +4,6 @@ import cats._
 import cats.implicits._
 import cats.effect._
 import cats.effect.implicits._
-import cats.effect.kernel.Sync
-import cats.effect.kernel.Resource
 import cats.effect.kernel.Resource.ExitCase
 
 class Transactor[F[_]: Sync] private (dataSource: DataSource[F]):

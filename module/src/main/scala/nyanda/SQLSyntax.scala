@@ -1,10 +1,5 @@
 package nyanda
 
-import java.sql.Connection
-import javax.sql.DataSource
-import java.sql.ResultSet
-import nyanda._
-
 trait SQLSyntax[F[_]]:
 
   extension (sc: StringContext)
