@@ -7,7 +7,7 @@ import cats.effect.Sync
 
 trait Dsl[F[_]: Sync]
     extends ResultSetGetInstances[F]
-    with ResultSetReadInstances[F]
+    with ResultSetConsumeInstances[F]
     with ParameterBindInstances[F]
     with SQLSyntax[F]:
   object DB extends DatabaseOps[F]
@@ -22,8 +22,8 @@ private[nyanda] trait DatabaseOps[F[_]: Sync]:
     new ConnectionOps[F](conn).update(sql)
   }
 
-  def query[A](sql: SQL[F])(using g: ResultSetRead[F, A]): Kleisli[F, Connection[F], A] =
-    Kleisli(new ConnectionOps[F](_).query(sql) >>= g.read)
+  def query[A](sql: SQL[F])(using g: ResultSetConsume[F, A]): Kleisli[F, Connection[F], A] =
+    Kleisli(new ConnectionOps[F](_).query(sql) >>= g.consume)
 
 private[nyanda] trait ResultSetOps[F[_]]:
 
