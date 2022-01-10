@@ -10,6 +10,7 @@ trait ResultSet[F[_]]:
   def getLong(columnLabel: String): F[Long]
   def getShort(columnLabel: String): F[Short]
   def getString(columnLabel: String): F[String]
+  def getTimestamp(columnLabel: String): F[java.sql.Timestamp]
 
 object ResultSet:
 
@@ -20,4 +21,5 @@ object ResultSet:
       def getLong(columnLabel: String): F[Long] = Sync[F].blocking(rs.getLong(columnLabel))
       def getShort(columnLabel: String): F[Short] = Sync[F].blocking(rs.getShort(columnLabel))
       def getString(columnLabel: String): F[String] = Sync[F].blocking(rs.getString(columnLabel))
+      def getTimestamp(columnLabel: String): F[java.sql.Timestamp] = Sync[F].blocking(rs.getTimestamp(columnLabel))
     }

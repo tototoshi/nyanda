@@ -37,5 +37,19 @@ trait ResultSetGetInstances[F[_]: Functor]:
   given ResultSetGet[F, Short] with
     def get(column: String) = Kleisli(_.getShort(column))
 
+  given ResultSetGet[F, java.sql.Timestamp] with
+    def get(column: String) = Kleisli(_.getTimestamp(column))
+
+  given [T](using g: ResultSetGet[F, java.sql.Timestamp]): ResultSetGet[F, java.time.Instant] = g.map(_.toInstant)
+
+  given [T](using g: ResultSetGet[F, java.sql.Timestamp]): ResultSetGet[F, java.util.Date] =
+    g.map(t => new java.util.Date(t.getTime))
+
+  given [T](using g: ResultSetGet[F, java.time.Instant]): ResultSetGet[F, java.time.ZonedDateTime] =
+    g.map(i => java.time.ZonedDateTime.ofInstant(i, java.time.ZoneId.systemDefault))
+
+  given [T](using g: ResultSetGet[F, java.time.Instant]): ResultSetGet[F, java.time.LocalDateTime] =
+    g.map(i => java.time.LocalDateTime.ofInstant(i, java.time.ZoneId.systemDefault))
+
   given [T](using g: ResultSetGet[F, T]): ResultSetGet[F, Option[T]] =
     g.map(Option.apply)
