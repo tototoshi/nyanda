@@ -9,11 +9,12 @@ import cats.effect.kernel.Resource
 import cats.effect.std.Console
 import org.h2.jdbcx.JdbcDataSource
 
-case class Person(id: Int, name: String)
+case class Person(id: Int, name: String, nickname: Option[String])
 
 trait PersonDao[F[_]: Applicative] extends Dsl[F]:
 
-  private val personGet = (RS.get[Int]("id"), RS.get[String]("name")).mapN((id, s) => Person(id, s))
+  private val personGet =
+    (RS.get[Int]("id"), RS.get[String]("name"), RS.get[Option[String]]("nickname")).mapN(Person.apply)
 
   given ResultSetRead[F, Person] = ResultSetRead(personGet)
 
@@ -22,17 +23,20 @@ trait PersonDao[F[_]: Applicative] extends Dsl[F]:
       create table if not exists person(
         id integer not null,
         name varchar(32) not null,
+        nickname varchar(32),
         primary key(id)
       )
       """
 
   def createTable: QueryF[F, Int] = DB.update(ddl)
 
-  def insert(p: Person): QueryF[F, Int] = DB.update(sql"insert into person (id, name) values (${p.id}, ${p.name})")
+  def insert(p: Person): QueryF[F, Int] =
+    DB.update(sql"insert into person (id, name, nickname) values (${p.id}, ${p.name}, ${p.nickname})")
 
-  def findById(id: Int): QueryF[F, Option[Person]] = DB.query(sql"select id, name from person where id = ${1}")
+  def findById(id: Int): QueryF[F, Option[Person]] =
+    DB.query(sql"select id, name, nickname from person where id = ${1}")
 
-  def findAll: QueryF[F, Seq[Person]] = DB.query(sql"select id, name from person")
+  def findAll: QueryF[F, Seq[Person]] = DB.query(sql"select id, name, nickname from person")
 
 object Main extends IOApp:
 
@@ -47,9 +51,9 @@ object Main extends IOApp:
 
   val people =
     List(
-      Person(1, "Takahashi"),
-      Person(2, "Suzuki"),
-      Person(3, "Sato")
+      Person(1, "Takahashi", "Taka".some),
+      Person(2, "Suzuki", None),
+      Person(3, "Sato", None)
     )
 
   def personDao[F[_]: Sync] = new PersonDao[F] {}
@@ -69,5 +73,5 @@ object Main extends IOApp:
 
 // sbt:root> example/run
 // [info] running (fork) nyanda.example.Main
-// [info] Some(Person(1,Takahashi))
-// [info] List(Person(1,Takahashi), Person(2,Suzuki), Person(3,Sato))
+// [info] Some(Person(1,Takahashi,Some(Taka)))
+// [info] List(Person(1,Takahashi,Some(Taka)), Person(2,Suzuki,None), Person(3,Sato,None))
