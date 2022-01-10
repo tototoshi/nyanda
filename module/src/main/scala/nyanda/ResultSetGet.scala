@@ -22,6 +22,14 @@ trait ResultSetGetInstances[F[_]: Functor]:
     def map[A, B](fa: ResultSetGetF[A])(f: A => B): ResultSetGetF[B] =
       ResultSetGet(column => rs => fa.get(column)(rs).map(f))
 
+  given javaSqlArrayResultSetGet: ResultSetGet[F, java.sql.Array] = ResultSetGet(column => rs => rs.getArray(column))
+
+  given ResultSetGet[F, Boolean] = ResultSetGet(column => rs => rs.getBoolean(column))
+
+  given ResultSetGet[F, Byte] = ResultSetGet(column => rs => rs.getByte(column))
+
+  given byteArrayResultSetGet: ResultSetGet[F, Array[Byte]] = ResultSetGet(column => rs => rs.getBytes(column))
+
   given ResultSetGet[F, String] = ResultSetGet(column => rs => rs.getString(column))
 
   given ResultSetGet[F, Int] = ResultSetGet(column => rs => rs.getInt(column))
@@ -29,6 +37,10 @@ trait ResultSetGetInstances[F[_]: Functor]:
   given ResultSetGet[F, Long] = ResultSetGet(column => rs => rs.getLong(column))
 
   given ResultSetGet[F, Short] = ResultSetGet(column => rs => rs.getShort(column))
+
+  given ResultSetGet[F, Float] = ResultSetGet(column => rs => rs.getFloat(column))
+
+  given ResultSetGet[F, Double] = ResultSetGet(column => rs => rs.getDouble(column))
 
   given ResultSetGet[F, java.sql.Timestamp] = ResultSetGet(column => rs => rs.getTimestamp(column))
 
@@ -46,6 +58,8 @@ trait ResultSetGetInstances[F[_]: Functor]:
   given ResultSetGet[F, java.sql.Date] = ResultSetGet(column => rs => rs.getDate(column))
 
   given [T](using g: ResultSetGet[F, java.sql.Date]): ResultSetGet[F, java.time.LocalDate] = g.map(_.toLocalDate)
+
+  given ResultSetGet[F, java.sql.Time] = ResultSetGet(column => rs => rs.getTime(column))
 
   given [T](using g: ResultSetGet[F, T]): ResultSetGet[F, Option[T]] =
     g.map(Option.apply)
