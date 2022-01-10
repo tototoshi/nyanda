@@ -20,7 +20,6 @@ object PreparedStatement:
     new PreparedStatement[F] {
       def executeQuery(): F[ResultSet[F]] = Sync[F].blocking(stmt.executeQuery()).map(rs => ResultSet[F](rs))
       def executeUpdate(): F[Int] = Sync[F].blocking(stmt.executeUpdate())
-
       def setInt(parameterIndex: Int, x: Int): F[Unit] =
         Sync[F].blocking(stmt.setInt(parameterIndex, x))
       def setLong(parameterIndex: Int, x: Long): F[Unit] =
@@ -29,7 +28,6 @@ object PreparedStatement:
         Sync[F].blocking(stmt.setObject(parameterIndex, x))
       def setShort(parameterIndex: Int, x: Short): F[Unit] =
         Sync[F].blocking(stmt.setShort(parameterIndex, x))
-
       def setString(parameterIndex: Int, x: String): F[Unit] =
         Sync[F].blocking(stmt.setString(parameterIndex, x))
       def setTimestamp(parameterIndex: Int, x: java.sql.Timestamp): F[Unit] =

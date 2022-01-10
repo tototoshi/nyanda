@@ -11,10 +11,7 @@ import cats.effect.implicits._
 import cats.effect.unsafe.implicits.global
 import org.h2.jdbcx.JdbcDataSource
 
-class CatsEffectTest extends FunSuite:
-
-  private val dsl: Dsl[IO] = Dsl[IO]
-  import dsl.{_, given}
+class CatsEffectTest extends FunSuite with Dsl[IO]:
 
   val dataSource =
     val ds = new JdbcDataSource()
@@ -37,13 +34,14 @@ class CatsEffectTest extends FunSuite:
     )
 
   given ResultSetRead[IO, Person] = ResultSetRead {
+    import RS._
     val id = get[Int]("id")
     val name = get[String]("name")
     val nickname = get[Option[String]]("nickname")
     (id, name, nickname).mapN(Person.apply)
   }
 
-  def ddl = update(sql"""
+  def ddl = DB.update(sql"""
       create table person(
         id integer not null,
         name varchar(32) not null,
@@ -52,16 +50,16 @@ class CatsEffectTest extends FunSuite:
       )
       """)
 
-  def drop = update(sql"drop table person")
+  def drop: Query[Int] = DB.update(sql"drop table person")
 
-  def insertAll(people: List[Person]) = people.traverse(insert)
+  def insertAll(people: List[Person]): Query[List[Int]] = people.traverse(insert)
 
-  def insert(p: Person) =
-    update(sql"insert into person (id, name, nickname) values (${p.id}, ${p.name}, ${p.nickname})")
+  def insert(p: Person): Query[Int] =
+    DB.update(sql"insert into person (id, name, nickname) values (${p.id}, ${p.name}, ${p.nickname})")
 
-  def findById(id: Int) = query(sql"select id, name, nickname from person where id = ${id}") >>> as[Option[Person]]
+  def findById(id: Int): Query[Option[Person]] = DB.query(sql"select id, name, nickname from person where id = ${id}")
 
-  def findAll = query(sql"select id, name, nickname from person") >>> as[Seq[Person]]
+  def findAll: Query[Seq[Person]] = DB.query(sql"select id, name, nickname from person")
 
   override def beforeEach(context: BeforeEach): Unit =
     dataSource

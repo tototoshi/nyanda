@@ -11,6 +11,31 @@ import cats.effect.std.Console
 import javax.sql.DataSource
 import org.h2.jdbcx.JdbcDataSource
 
+case class Person(id: Int, name: String)
+
+trait PersonDao[F[_]: Applicative] extends Dsl[F]:
+
+  private val personGet = (RS.get[Int]("id"), RS.get[String]("name")).mapN((id, s) => Person(id, s))
+
+  given ResultSetRead[F, Person] = ResultSetRead(personGet)
+
+  private val ddl: SQL[F] =
+    sql"""
+      create table if not exists person(
+        id integer not null,
+        name varchar(32) not null,
+        primary key(id)
+      )
+      """
+
+  def createTable: QueryF[F, Int] = DB.update(ddl)
+
+  def insert(p: Person): QueryF[F, Int] = DB.update(sql"insert into person (id, name) values (${p.id}, ${p.name})")
+
+  def findById(id: Int): QueryF[F, Option[Person]] = DB.query(sql"select id, name from person where id = ${1}")
+
+  def findAll: QueryF[F, Seq[Person]] = DB.query(sql"select id, name from person")
+
 object Main extends IOApp:
 
   val dataSource =
@@ -19,8 +44,6 @@ object Main extends IOApp:
     ds.setUser("sa")
     ds.setPassword("")
     ds
-
-  case class Person(id: Int, name: String)
 
   val person1 = Person(1, "Takahashi")
   val person2 = Person(2, "Suzuki")
@@ -33,28 +56,15 @@ object Main extends IOApp:
       person3
     )
 
+  def personDao[F[_]: Sync] = new PersonDao[F] {}
+
   def queryGroup[F[_]: Sync: Console]: Kleisli[F, Connection[F], (Option[Person], Seq[Person])] =
-    val db: Dsl[F] = Dsl[F]
-    import db.{_, given}
-
-    val personGet = (get[Int]("id"), get[String]("name")).mapN((id, s) => Person(id, s))
-
-    given ResultSetRead[F, Person] = ResultSetRead(personGet)
-
     for {
-      _ <- update(sql"""
-                    create table if not exists person(
-                      id integer not null,
-                      name varchar(32) not null,
-                      primary key(id)
-                    )
-                    """)
-      _ <- people.traverse { p =>
-        update(sql"insert into person (id, name) values (${p.id}, ${p.name})")
-      }
-      result1 <- query(sql"select id, name from person where id = ${1}") >>> as[Option[Person]]
+      _ <- personDao.createTable
+      _ <- people.traverse(personDao.insert)
+      result1 <- personDao.findById(1)
       _ <- Kleisli.liftF(Console[F].println(result1))
-      result2 <- query(sql"select id, name from person") >>> as[Seq[Person]]
+      result2 <- personDao.findAll
       _ <- Kleisli.liftF(Console[F].println(result2))
     } yield (result1, result2)
 
