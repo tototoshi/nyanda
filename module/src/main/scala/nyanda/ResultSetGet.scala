@@ -10,9 +10,8 @@ trait ResultSetGet[F[_], A]:
 object ResultSetGet:
 
   def apply[F[_], A](f: String => ResultSet[F] => F[A]): ResultSetGet[F, A] =
-    new ResultSetGet[F, A] {
+    new ResultSetGet[F, A]:
       def get(column: String)(rs: ResultSet[F]): F[A] = f(column)(rs)
-    }
 
 trait ResultSetGetInstances[F[_]: Functor]:
 
