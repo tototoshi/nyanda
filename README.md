@@ -4,7 +4,8 @@
 
 Database Accessor for cats
 
-- [Example](./example/src/main/scala/nyanda/example/Main.scala)
+- [HelloExample](./example/src/main/scala/nyanda/example/HelloExample.scala)
+- [DaoExample](./example/src/main/scala/nyanda/example/DaoExample.scala)
 
 ## Usage
 
