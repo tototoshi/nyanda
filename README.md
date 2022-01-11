@@ -1,8 +1,8 @@
-# nyanda
+# nyanda 🐱
 
 [![Scala CI](https://github.com/tototoshi/nyanda/actions/workflows/scala.yml/badge.svg)](https://github.com/tototoshi/nyanda/actions/workflows/scala.yml)
 
-Database Accessor for cats
+Database Accessor for cats. Written in Scala 3 and cats-effect 3. 
 
 - [HelloExample](./example/src/main/scala/nyanda/example/HelloExample.scala)
 - [DaoExample](./example/src/main/scala/nyanda/example/DaoExample.scala)
