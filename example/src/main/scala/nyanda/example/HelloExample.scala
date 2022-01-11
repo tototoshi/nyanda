@@ -5,7 +5,7 @@ import cats.effect._
 import org.h2.jdbcx.JdbcDataSource
 import nyanda._
 
-object Hello extends IOApp.Simple with Dsl[IO]:
+object HelloExample extends IOApp.Simple with Dsl[IO]:
 
   val dataSource =
     val ds = new JdbcDataSource()

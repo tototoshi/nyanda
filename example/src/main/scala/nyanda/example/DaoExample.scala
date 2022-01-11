@@ -43,7 +43,7 @@ trait PersonDao[F[_]: Applicative] extends Dsl[F]:
 
   def findAll: Query[F, Seq[Person]] = DB.query(sql"select id, name, nickname, created_at from person")
 
-object Main extends IOApp:
+object DaoExample extends IOApp:
 
   val dataSource =
     val ds = new JdbcDataSource()
