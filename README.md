@@ -78,3 +78,47 @@ DB.update(sql"create table ....")
 // Equivalent to java.sql.Connection#executeQuery
 DB.query[Option[String]](sql"select * from ....")
 ```
+
+### ResultSetGet[T]/ResultSetRead[T]
+
+For the conversion from `ResultSet` to user-defined types, the `ResultSetGet[F, T]/ResultSetRead[F, T]` typeclasses are provided.
+
+ResultSetGet is defined as follows. 
+
+```scala
+trait ResultSetGet[F[_], T]:
+  def get(column: String)(rs: ResultSet[F]): F[T]
+```
+
+`ResultSet[F]` is a type that wraps `java.sql.ResultSet` and is defined by this library to separate the "effects". Similarly, this library also defines `Connection[F]`, `DataSource[F]`, etc.
+
+
+If you have an instance of `ResultSetGet[F, T]` (e.g. `ResultSetGet[IO, String]`), you can use the `RS.get[T]` method. (For simple types such as `String`, `Int`, `ZonedDateTime`, etc., an instance of `ResultSetGet[F, T]` is already provided.
+)
+
+```scala
+def get[A](column: String)(using g: ResultSetGet[F, A]): Kleisli[F, ResultSet[F], A]
+```
+
+`get[T]` returns `Kleisli[F, ResultSet[F], A]`. you can use the features of `Kleisli`, `Applicative`, and `Monad` to compose operations with `get[T]`.
+ You can then wrap it with `ResultSetRead.apply` to get an instance of `ResultSetRead[F, T]`.
+
+```scala
+case class Person(id: Int, name: String, nickname: Option[String])
+
+def personGet[F[_]: Monad]: Kleisli[F, ResultSet[F], Person] = for
+  id <- RS.get[Int]("id")
+  name <- RS.get[String]("name")
+  nickname <- RS.get[Option[Stirng]]("nickname")
+yield Person(id, name, nickname)
+
+/*
+or
+
+def personGet[F[_]: Applicative]: Kleisli[F, ResultSet[F], Person] =
+  (RS.get[String]("id"), RS.get[String]("name"), RS.get("nickname")[Option[String]).mapN(Person.apply)
+*/  
+```
+
+
+
