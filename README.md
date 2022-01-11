@@ -24,7 +24,7 @@ object Hello extends IOApp.Simple with Dsl[IO]:
 
   val dataSource =
     val ds = new JdbcDataSource()
-    ds.setUrl("jdbc:h2:mem:hello;MODE=MySQL")
+    ds.setUrl("jdbc:h2:mem:hello;DB_CLOSE_DELAY=1")
     ds.setUser("sa")
     ds.setPassword("")
     ds
@@ -133,7 +133,7 @@ val dsl: Dsl[IO] = new Dsl[IO]
 import dsl{_, given}
 
 val ds = new JdbcDataSource()
-ds.setUrl("jdbc:h2:mem:effect;DB_CLOSE_DELAY=1")
+ds.setUrl("jdbc:h2:mem:hello;DB_CLOSE_DELAY=1")
 ds.setUser("sa")
 ds.setPassword("")
 
