@@ -25,5 +25,5 @@ trait ResultSetConsumeInstances[F[_]: Sync]:
           else Sync[F].pure(None)
       yield result
 
-  given [T](using r: ResultSetRead[F, T]): ResultSetConsume[F, Seq[T]] with
-    def consume(rs: ResultSet[F]): F[Seq[T]] = Monad[F].whileM[Seq, T](rs.next())(r.read(rs))
+  given [T, S[_]: Traverse: Alternative](using r: ResultSetRead[F, T]): ResultSetConsume[F, S[T]] with
+    def consume(rs: ResultSet[F]): F[S[T]] = Monad[F].whileM[S, T](rs.next())(r.read(rs))

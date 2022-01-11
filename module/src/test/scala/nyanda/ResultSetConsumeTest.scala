@@ -105,3 +105,41 @@ class ResultSetConsumeTest extends FunSuite with Dsl[IO]:
 
     program.unsafeRunSync()
   }
+
+  test("for Seq[T]") {
+    val program =
+      t.transaction.use {
+        (for
+          _ <- ddl *> insertAll(people)
+          result1 <- DB.query[Seq[Person]](sql"select id, name, nickname from person where id = 1")
+          result2 <- DB.query[Seq[Person]](sql"select id, name, nickname from person")
+          result3 <- DB.query[Seq[Person]](sql"select id, name, nickname from person where id > 3")
+          _ <- Kleisli.liftF(IO {
+            assertEquals(result1, Seq(person1))
+            assertEquals(result2, Seq(person1, person2, person3))
+            assertEquals(result3, Seq.empty[Person])
+          })
+        yield result1).run
+      }
+
+    program.unsafeRunSync()
+  }
+
+  test("for List[T]") {
+    val program =
+      t.transaction.use {
+        (for
+          _ <- ddl *> insertAll(people)
+          result1 <- DB.query[Seq[Person]](sql"select id, name, nickname from person where id = 1")
+          result2 <- DB.query[Seq[Person]](sql"select id, name, nickname from person")
+          result3 <- DB.query[Seq[Person]](sql"select id, name, nickname from person where id > 3")
+          _ <- Kleisli.liftF(IO {
+            assertEquals(result1, Seq(person1))
+            assertEquals(result2, Seq(person1, person2, person3))
+            assertEquals(result3, Seq.empty[Person])
+          })
+        yield result1).run
+      }
+
+    program.unsafeRunSync()
+  }
