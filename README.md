@@ -50,7 +50,7 @@ You can use features by inheriting or importing the Dsl traits.
 ```scala
 import nyanda._
 object Main extends Dsl[cats.effect.IO]:
-  ... your code
+// ... your code
 ```
 
 ```scala
@@ -58,7 +58,7 @@ import nyanda._
 val dsl: Dsl[IO] = new Dsl[IO]
 import dsl{_, given}
 
-...your code
+// ...your code
 ```
 
 ### Query
