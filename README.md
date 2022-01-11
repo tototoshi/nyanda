@@ -79,7 +79,7 @@ DB.update(sql"create table ....")
 DB.query[Option[String]](sql"select * from ....")
 ```
 
-### ResultSetGet[T]/ResultSetRead[T]
+### ResultSetGet[F, T]/ResultSetRead[F, T]
 
 For the conversion from `ResultSet` to user-defined types, the `ResultSetGet[F, T]/ResultSetRead[F, T]` typeclasses are provided.
 
@@ -120,5 +120,41 @@ def personGet[F[_]: Applicative]: Kleisli[F, ResultSet[F], Person] =
 */  
 ```
 
+### Connection and Transaction
 
+`Transactor` is used to manage transactions. `Transactor` provides methods such as `autoCommit`, `readOnly`, and `transaction`.
+
+```scala
+import nyanda
+import org.h2.jdbcx.JdbcDataSource
+
+val dsl: Dsl[IO] = new Dsl[IO]
+import dsl{_, given}
+
+val ds = new JdbcDataSource()
+ds.setUrl("jdbc:h2:mem:effect;DB_CLOSE_DELAY=1")
+ds.setUser("sa")
+ds.setPassword("")
+
+val transactor = Transactor[IO](ds)
+
+val q = DB.query[Option[Person]](sql"select * from person")
+transactor.transaction.use(q.run).unsafeRunSync()
+```
+
+You can also compose multiple queries and execute them at once.
+
+The `DB.update` and `DB.query` methods return `Query[F, T]` type, which is an alias to `Kleisli[F, Connection[F], T]`. 
+
+So you can:
+
+```scala
+val insertAndFind: Query[IO, Option[Person]] = 
+  for
+    _ <- DB.update(sql"insert into person (id, name, nickname, created_at) values (${p.id}, ${p.name}, ${p.nickname}, ${p.createdAt})")
+    result <- DB.query[Option[Person]](sql"select id, name, nickname, created_at from person where id = ${1}")
+  yield result
+
+transactor.transaction.use(insertAndFind.run).unsafeRunSync()
+```
 
