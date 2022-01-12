@@ -2,6 +2,7 @@ package nyanda
 
 class TestResultSet[F[_]] extends ResultSet[F] {
   def getArray(columnLabel: String): F[java.sql.Array] = ???
+  def getBigDecimal(columnLabel: String): F[BigDecimal] = ???
   def getBoolean(columnLabel: String): F[Boolean] = ???
   def getByte(columnLabel: String): F[Byte] = ???
   def getBytes(columnLabel: String): F[Array[Byte]] = ???

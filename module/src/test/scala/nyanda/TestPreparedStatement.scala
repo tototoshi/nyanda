@@ -4,6 +4,7 @@ trait MockPreparedStatement[F[_]] extends PreparedStatement[F]:
   def executeQuery(): F[nyanda.ResultSet[F]] = ???
   def executeUpdate(): F[Int] = ???
   def setArray(parameterIndex: Int, x: java.sql.Array): F[Unit] = ???
+  def setBigDecimal(parameterIndex: Int, x: BigDecimal): F[Unit] = ???
   def setBoolean(parameterIndex: Int, x: Boolean): F[Unit] = ???
   def setByte(parameterIndex: Int, x: Byte): F[Unit] = ???
   def setBytes(parameterIndex: Int, x: Array[Byte]): F[Unit] = ???

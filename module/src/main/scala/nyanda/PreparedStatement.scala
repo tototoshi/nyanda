@@ -8,6 +8,7 @@ trait PreparedStatement[F[_]]:
   def executeQuery(): F[ResultSet[F]]
   def executeUpdate(): F[Int]
   def setArray(parameterIndex: Int, x: java.sql.Array): F[Unit]
+  def setBigDecimal(parameterIndex: Int, x: BigDecimal): F[Unit]
   def setBoolean(parameterIndex: Int, x: Boolean): F[Unit]
   def setByte(parameterIndex: Int, x: Byte): F[Unit]
   def setBytes(parameterIndex: Int, x: Array[Byte]): F[Unit]
@@ -30,6 +31,8 @@ object PreparedStatement:
       def executeUpdate(): F[Int] = Sync[F].blocking(stmt.executeUpdate())
       def setArray(parameterIndex: Int, x: java.sql.Array): F[Unit] =
         Sync[F].blocking(stmt.setArray(parameterIndex, x))
+      def setBigDecimal(parameterIndex: Int, x: BigDecimal): F[Unit] =
+        Sync[F].blocking(stmt.setBigDecimal(parameterIndex, x.bigDecimal))
       def setBoolean(parameterIndex: Int, x: Boolean): F[Unit] =
         Sync[F].blocking(stmt.setBoolean(parameterIndex, x))
       def setByte(parameterIndex: Int, x: Byte): F[Unit] =

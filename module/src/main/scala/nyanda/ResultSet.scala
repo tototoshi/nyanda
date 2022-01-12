@@ -7,6 +7,7 @@ import cats.effect.Sync
 trait ResultSet[F[_]]:
   def next(): F[Boolean]
   def getArray(columnLabel: String): F[java.sql.Array]
+  def getBigDecimal(columnLabel: String): F[BigDecimal]
   def getBoolean(columnLabel: String): F[Boolean]
   def getByte(columnLabel: String): F[Byte]
   def getBytes(columnLabel: String): F[Array[Byte]]
@@ -26,6 +27,7 @@ object ResultSet:
     new ResultSet[F]:
       def next(): F[Boolean] = Sync[F].blocking(rs.next())
       def getArray(columnLabel: String): F[java.sql.Array] = Sync[F].blocking(rs.getArray(columnLabel))
+      def getBigDecimal(columnLabel: String): F[BigDecimal] = Sync[F].blocking(rs.getBigDecimal(columnLabel))
       def getBoolean(columnLabel: String): F[Boolean] = Sync[F].blocking(rs.getBoolean(columnLabel))
       def getByte(columnLabel: String): F[Byte] = Sync[F].blocking(rs.getByte(columnLabel))
       def getBytes(columnLabel: String): F[Array[Byte]] = Sync[F].blocking(rs.getBytes(columnLabel))
