@@ -140,7 +140,7 @@ ds.setPassword("")
 val transactor = Transactor[IO](ds)
 
 val q = DB.query[Option[Person]](sql"select * from person")
-transactor.transaction.use(q.run).unsafeRunSync()
+transactor.transaction.useKleisli(q).unsafeRunSync()
 ```
 
 You can also compose multiple queries and execute them at once.
@@ -156,6 +156,6 @@ val insertAndFind: Query[IO, Option[Person]] =
     result <- DB.query[Option[Person]](sql"select id, name, nickname, created_at from person where id = ${1}")
   yield result
 
-transactor.transaction.use(insertAndFind.run).unsafeRunSync()
+transactor.transaction.useKelisli(insertAndFind).unsafeRunSync()
 ```
 

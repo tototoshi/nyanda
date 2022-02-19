@@ -39,7 +39,7 @@ trait PersonDao[F[_]: Applicative] extends Dsl[F]:
     )
 
   def findById(id: Int): Query[F, Option[Person]] =
-    DB.query(sql"select id, name, nickname, created_at from person where id = ${1}")
+    DB.query(sql"select id, name, nickname, created_at from person where id = $id")
 
   def findAll: Query[F, Seq[Person]] = DB.query(sql"select id, name, nickname, created_at from person")
 
@@ -74,7 +74,7 @@ object DaoExample extends IOApp:
     yield (result1, result2)
 
   override def run(args: List[String]): IO[ExitCode] =
-    transactor.transaction.use(queryGroup[IO].run).map(_ => ExitCode.Success)
+    transactor.transaction.useKleisli(queryGroup[IO]).as(ExitCode.Success)
 
 // sbt:root> example/run
 // [info] compiling 1 Scala source to /Users/cw-toshiyuki.takahashi/work/github.com/tototoshi/nyanda/example/target/scala-3.1.0/classes ...
