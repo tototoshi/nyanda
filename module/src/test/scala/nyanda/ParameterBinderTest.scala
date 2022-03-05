@@ -8,15 +8,15 @@ import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.LocalDate
 import java.time.ZoneOffset
-import cats.implicits._
+import cats.implicits.*
 import cats.effect.{IO, Ref}
-import cats.effect.implicits._
+import cats.effect.implicits.*
 import cats.effect.unsafe.implicits.global
 
 class ParameterBinderTest extends FunSuite:
 
   private val dsl: Dsl[IO] = Dsl[IO]
-  import dsl.{_, given}
+  import dsl.*
 
   test("Bind Int") {
     val id = 100

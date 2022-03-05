@@ -2,7 +2,7 @@
 
 [![Scala CI](https://github.com/tototoshi/nyanda/actions/workflows/scala.yml/badge.svg)](https://github.com/tototoshi/nyanda/actions/workflows/scala.yml)
 
-Database Accessor for cats. Written in Scala 3 and cats-effect 3. 
+Database Accessor for cats. Written in Scala 3 and cats-effect 3.
 
 - [HelloExample](./example/src/main/scala/nyanda/example/HelloExample.scala)
 - [DaoExample](./example/src/main/scala/nyanda/example/DaoExample.scala)
@@ -15,10 +15,10 @@ Database Accessor for cats. Written in Scala 3 and cats-effect 3.
 ```scala
 package nyanda.example
 
-import cats.implicits._
-import cats.effect._
+import cats.implicits.*
+import cats.effect.*
 import org.h2.jdbcx.JdbcDataSource
-import nyanda._
+import nyanda.*
 
 object Hello extends IOApp.Simple with Dsl[IO]:
 
@@ -48,15 +48,15 @@ object Hello extends IOApp.Simple with Dsl[IO]:
 You can use features by inheriting or importing the Dsl traits.
 
 ```scala
-import nyanda._
+import nyanda.*
 object Main extends Dsl[cats.effect.IO]:
 // ... your code
 ```
 
 ```scala
-import nyanda._
+import nyanda.*
 val dsl: Dsl[IO] = new Dsl[IO]
-import dsl{_, given}
+import dsl.*
 
 // ...your code
 ```
@@ -84,7 +84,7 @@ DB.query[Option[String]](sql"select * from ....")
 
 For the conversion from `ResultSet` to user-defined types, the `ResultSetGet[F, T]/ResultSetRead[F, T]` typeclasses are provided.
 
-ResultSetGet is defined as follows. 
+ResultSetGet is defined as follows.
 
 ```scala
 trait ResultSetGet[F[_], T]:
@@ -118,7 +118,7 @@ or
 
 def personGet[F[_]: Applicative]: Kleisli[F, ResultSet[F], Person] =
   (RS.get[String]("id"), RS.get[String]("name"), RS.get("nickname")[Option[String]).mapN(Person.apply)
-*/  
+*/
 ```
 
 ### Connection and Transaction
@@ -130,7 +130,7 @@ import nyanda
 import org.h2.jdbcx.JdbcDataSource
 
 val dsl: Dsl[IO] = new Dsl[IO]
-import dsl{_, given}
+import dsl.*
 
 val ds = new JdbcDataSource()
 ds.setUrl("jdbc:h2:mem:hello;DB_CLOSE_DELAY=1")
@@ -145,12 +145,12 @@ transactor.transaction.useKleisli(q).unsafeRunSync()
 
 You can also compose multiple queries and execute them at once.
 
-The `DB.update` and `DB.query` methods return `Query[F, T]` type, which is an alias to `Kleisli[F, Connection[F], T]`. 
+The `DB.update` and `DB.query` methods return `Query[F, T]` type, which is an alias to `Kleisli[F, Connection[F], T]`.
 
 So you can:
 
 ```scala
-val insertAndFind: Query[IO, Option[Person]] = 
+val insertAndFind: Query[IO, Option[Person]] =
   for
     _ <- DB.update(sql"insert into person (id, name, nickname, created_at) values (${p.id}, ${p.name}, ${p.nickname}, ${p.createdAt})")
     result <- DB.query[Option[Person]](sql"select id, name, nickname, created_at from person where id = ${1}")
@@ -158,4 +158,3 @@ val insertAndFind: Query[IO, Option[Person]] =
 
 transactor.transaction.useKelisli(insertAndFind).unsafeRunSync()
 ```
-

@@ -1,10 +1,10 @@
 package nyanda.example
 
-import nyanda._
-import cats._
+import nyanda.*
+import cats.*
 import cats.data.Kleisli
-import cats.implicits._
-import cats.effect._
+import cats.implicits.*
+import cats.effect.*
 import cats.effect.kernel.Resource
 import cats.effect.std.Console
 import org.h2.jdbcx.JdbcDataSource
@@ -23,8 +23,8 @@ object PersonDao:
 
   def apply[F[_]](using ev: PersonDao[F]): Any = ev
 
-  given [F[_]: Sync: Functor](using dsl: Dsl[F]): PersonDao[F] = new PersonDao[F]:
-    import dsl.{given, *}
+  given [F[_]: Sync](using dsl: Dsl[F]): PersonDao[F] = new PersonDao[F]:
+    import dsl.*
 
     private val personGet =
       (

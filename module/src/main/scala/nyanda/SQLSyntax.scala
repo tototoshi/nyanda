@@ -10,6 +10,3 @@ trait SQLSyntax[F[_]]:
         statement = strings.mkString("?"),
         params = expressions.toSeq
       )
-
-  given [A](using ParameterBind[F, A]): Conversion[A, ParameterBinder[F]] with
-    def apply(value: A): ParameterBinder[F] = ParameterBinder[F, A](value)

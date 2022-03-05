@@ -1,14 +1,14 @@
 package nyanda.example
 
-import cats.implicits._
-import cats.effect._
+import cats.implicits.*
+import cats.effect.*
 import org.h2.jdbcx.JdbcDataSource
-import nyanda._
+import nyanda.*
 
 object HelloExample extends IOApp.Simple:
 
   private val dsl: Dsl[IO] = Dsl[IO]
-  import dsl.{given, *}
+  import dsl.*
 
   val dataSource =
     val ds = new JdbcDataSource()

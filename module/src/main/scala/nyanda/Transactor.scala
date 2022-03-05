@@ -1,9 +1,9 @@
 package nyanda
 
-import cats._
-import cats.implicits._
-import cats.effect._
-import cats.effect.implicits._
+import cats.*
+import cats.implicits.*
+import cats.effect.*
+import cats.effect.implicits.*
 import cats.effect.kernel.Resource.ExitCase
 
 class Transactor[F[_]: Sync] private (dataSource: DataSource[F]):

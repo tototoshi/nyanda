@@ -1,7 +1,7 @@
 package nyanda
 
-import cats._
-import cats.implicits._
+import cats.*
+import cats.implicits.*
 import cats.effect.Sync
 
 trait ResultSet[F[_]]:

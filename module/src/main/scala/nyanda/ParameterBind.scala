@@ -11,8 +11,6 @@ object ParameterBind:
         a.bind(statement, index, f(value))
     }
 
-trait ParameterBindInstances:
-
   given [F[_]]: ParameterBind[F, java.sql.Array] with
     def bind(statement: PreparedStatement[F], index: Int, value: java.sql.Array): F[Unit] =
       statement.setArray(index, value)

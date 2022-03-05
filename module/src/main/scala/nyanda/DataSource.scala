@@ -1,6 +1,6 @@
 package nyanda
 
-import cats.implicits._
+import cats.implicits.*
 import cats.effect.Sync
 
 trait DataSource[F[_]]:

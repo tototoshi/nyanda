@@ -1,19 +1,19 @@
 package nyanda
 
 import munit.FunSuite
-import cats._
+import cats.*
 import cats.data.Kleisli
-import cats.syntax._
-import cats.implicits._
-import cats.effect._
-import cats.effect.implicits._
+import cats.syntax.*
+import cats.implicits.*
+import cats.effect.*
+import cats.effect.implicits.*
 import cats.effect.unsafe.implicits.global
 import org.h2.jdbcx.JdbcDataSource
 
 class ResultSetConsumeTest extends FunSuite:
 
   private val dsl: Dsl[IO] = Dsl[IO]
-  import dsl.{_, given}
+  import dsl.*
 
   val ds = new JdbcDataSource()
   ds.setUrl("jdbc:h2:mem:ResultSetConsumeTest")
@@ -36,7 +36,7 @@ class ResultSetConsumeTest extends FunSuite:
     )
 
   given ResultSetRead[IO, Person] = ResultSetRead {
-    import RS._
+    import RS.*
     val id = get[Int]("id")
     val name = get[String]("name")
     val nickname = get[Option[String]]("nickname")

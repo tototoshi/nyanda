@@ -1,8 +1,7 @@
 package nyanda
 
-import cats._
-import cats.implicits._
-import cats.effect.Sync
+import cats.*
+import cats.implicits.*
 
 trait ResultSetGet[F[_], A]:
   def get(column: String)(rs: ResultSet[F]): F[A]
@@ -12,8 +11,6 @@ object ResultSetGet:
   def apply[F[_], A](f: String => ResultSet[F] => F[A]): ResultSetGet[F, A] =
     new ResultSetGet[F, A]:
       def get(column: String)(rs: ResultSet[F]): F[A] = f(column)(rs)
-
-trait ResultSetGetInstances:
 
   given [F[_]: Functor]: Functor[[A] =>> ResultSetGet[F, A]] with
     def map[A, B](fa: ResultSetGet[F, A])(f: A => B): ResultSetGet[F, B] =

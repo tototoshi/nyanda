@@ -1,9 +1,8 @@
 package nyanda
 
-import cats._
+import cats.*
 import cats.data.Kleisli
-import cats.implicits._
-import cats.effect._
+import cats.implicits.*
 
 trait ResultSetRead[F[_], T]:
   def read(rs: ResultSet[F]): F[T]
