@@ -9,39 +9,56 @@ import cats.effect.kernel.Resource
 import cats.effect.std.Console
 import org.h2.jdbcx.JdbcDataSource
 import java.time.{ZonedDateTime, ZoneId}
+import nyanda.example.PersonDao
 
 case class Person(id: Int, name: String, nickname: Option[String], createdAt: ZonedDateTime)
 
-trait PersonDao[F[_]: Applicative] extends Dsl[F]:
+trait PersonDao[F[_]]:
+  def createTable: Query[F, Int]
+  def insert(p: Person): Query[F, Int]
+  def findById(id: Int): Query[F, Option[Person]]
+  def findAll: Query[F, Seq[Person]]
 
-  private val personGet =
-    (RS.get[Int]("id"), RS.get[String]("name"), RS.get[Option[String]]("nickname"), RS.get[ZonedDateTime]("created_at"))
-      .mapN(Person.apply)
+object PersonDao:
 
-  given ResultSetRead[F, Person] = ResultSetRead(personGet)
+  def apply[F[_]](using ev: PersonDao[F]): Any = ev
 
-  private val ddl: SQL[F] =
-    sql"""
-      create table if not exists person(
-        id integer not null,
-        name varchar(32) not null,
-        nickname varchar(32),
-        created_at datetime not null,
-        primary key(id)
+  given [F[_]: Sync: Functor](using dsl: Dsl[F]): PersonDao[F] = new PersonDao[F]:
+    import dsl.{given, *}
+
+    private val personGet =
+      (
+        RS.get[Int]("id"),
+        RS.get[String]("name"),
+        RS.get[Option[String]]("nickname"),
+        RS.get[ZonedDateTime]("created_at")
       )
-      """
+        .mapN(Person.apply)
 
-  def createTable: Query[F, Int] = DB.update(ddl)
+    given ResultSetRead[F, Person] = ResultSetRead(personGet)
 
-  def insert(p: Person): Query[F, Int] =
-    DB.update(
-      sql"insert into person (id, name, nickname, created_at) values (${p.id}, ${p.name}, ${p.nickname}, ${p.createdAt})"
-    )
+    private val ddl: SQL[F] =
+      sql"""
+        create table if not exists person(
+          id integer not null,
+          name varchar(32) not null,
+          nickname varchar(32),
+          created_at datetime not null,
+          primary key(id)
+        )
+        """
 
-  def findById(id: Int): Query[F, Option[Person]] =
-    DB.query(sql"select id, name, nickname, created_at from person where id = $id")
+    def createTable: Query[F, Int] = DB.update(ddl)
 
-  def findAll: Query[F, Seq[Person]] = DB.query(sql"select id, name, nickname, created_at from person")
+    def insert(p: Person): Query[F, Int] =
+      DB.update(
+        sql"insert into person (id, name, nickname, created_at) values (${p.id}, ${p.name}, ${p.nickname}, ${p.createdAt})"
+      )
+
+    def findById(id: Int): Query[F, Option[Person]] =
+      DB.query(sql"select id, name, nickname, created_at from person where id = $id")
+
+    def findAll: Query[F, Seq[Person]] = DB.query(sql"select id, name, nickname, created_at from person")
 
 object DaoExample extends IOApp:
 
@@ -61,9 +78,7 @@ object DaoExample extends IOApp:
       Person(3, "Sato", None, ZonedDateTime.of(2021, 1, 1, 0, 0, 0, 0, ZoneId.systemDefault))
     )
 
-  def personDao[F[_]: Sync] = new PersonDao[F] {}
-
-  def queryGroup[F[_]: Sync: Console]: Query[F, (Option[Person], Seq[Person])] =
+  def queryGroup[F[_]: Sync: Console](using personDao: PersonDao[F]): Query[F, (Option[Person], Seq[Person])] =
     for
       _ <- personDao.createTable
       _ <- people.traverse(personDao.insert)

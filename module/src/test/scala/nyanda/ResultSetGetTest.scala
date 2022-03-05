@@ -7,7 +7,10 @@ import cats.effect._
 import cats.effect.implicits._
 import cats.effect.unsafe.implicits.global
 
-class ResultSetGetTest extends FunSuite with Dsl[IO]:
+class ResultSetGetTest extends FunSuite:
+
+  private val dsl: Dsl[IO] = Dsl[IO]
+  import dsl.{_, given}
 
   val mockResultSet: ResultSet[IO] = new TestResultSet[IO] {
     override def getInt(columnLabel: String) = IO.pure(1)
