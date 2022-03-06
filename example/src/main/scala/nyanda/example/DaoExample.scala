@@ -13,7 +13,7 @@ import nyanda.example.PersonDao
 
 case class Person(id: Int, name: String, nickname: Option[String], createdAt: ZonedDateTime)
 
-trait PersonDao[F[_]]:
+trait PersonDao[F[_]] extends Dsl[F]:
   def createTable: Query[F, Int]
   def insert(p: Person): Query[F, Int]
   def findById(id: Int): Query[F, Option[Person]]
@@ -23,8 +23,7 @@ object PersonDao:
 
   def apply[F[_]](using ev: PersonDao[F]): Any = ev
 
-  given [F[_]: Sync](using dsl: Dsl[F]): PersonDao[F] = new PersonDao[F]:
-    import dsl.*
+  given [F[_]: Sync]: PersonDao[F] = new PersonDao[F] with Dsl.Sync[F]:
 
     private val personGet =
       (

@@ -13,10 +13,7 @@ import cats.effect.{IO, Ref}
 import cats.effect.implicits.*
 import cats.effect.unsafe.implicits.global
 
-class ParameterBinderTest extends FunSuite:
-
-  private val dsl: Dsl[IO] = Dsl[IO]
-  import dsl.*
+class ParameterBinderTest extends FunSuite with Dsl.IO:
 
   test("Bind Int") {
     val id = 100

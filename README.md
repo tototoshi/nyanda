@@ -20,7 +20,7 @@ import cats.effect.*
 import org.h2.jdbcx.JdbcDataSource
 import nyanda.*
 
-object Hello extends IOApp.Simple with Dsl[IO]:
+object Hello extends IOApp.Simple with Dsl.IO:
 
   val dataSource =
     val ds = new JdbcDataSource()
@@ -49,14 +49,13 @@ You can use features by inheriting or importing the Dsl traits.
 
 ```scala
 import nyanda.*
-object Main extends Dsl[cats.effect.IO]:
+object Main extends Dsl.IO:
 // ... your code
 ```
 
 ```scala
 import nyanda.*
-val dsl: Dsl[IO] = new Dsl[IO]
-import dsl.*
+import Dsl.IO._
 
 // ...your code
 ```

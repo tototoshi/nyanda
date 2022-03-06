@@ -10,10 +10,7 @@ import cats.effect.implicits.*
 import cats.effect.unsafe.implicits.global
 import org.h2.jdbcx.JdbcDataSource
 
-class ResultSetConsumeTest extends FunSuite:
-
-  private val dsl: Dsl[IO] = Dsl[IO]
-  import dsl.*
+class ResultSetConsumeTest extends FunSuite with Dsl.IO:
 
   val ds = new JdbcDataSource()
   ds.setUrl("jdbc:h2:mem:ResultSetConsumeTest")

@@ -7,8 +7,7 @@ import nyanda.*
 
 object HelloExample extends IOApp.Simple:
 
-  private val dsl: Dsl[IO] = Dsl[IO]
-  import dsl.*
+  import Dsl.IO._
 
   val dataSource =
     val ds = new JdbcDataSource()

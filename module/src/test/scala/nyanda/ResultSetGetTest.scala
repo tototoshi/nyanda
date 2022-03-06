@@ -6,8 +6,7 @@ import cats.implicits.*
 
 class ResultSetGetTest extends FunSuite:
 
-  private val dsl: Dsl[Id] = Dsl[Id]
-  import dsl.*
+  val RS: ResultSetOps[Id] = ResultSetOps[Id]
 
   val mockResultSet: ResultSet[Id] = new TestResultSet[Id] {
     override def getInt(columnLabel: String) = 1
