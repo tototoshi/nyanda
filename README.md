@@ -128,8 +128,7 @@ def personGet[F[_]: Applicative]: Kleisli[F, ResultSet[F], Person] =
 import nyanda
 import org.h2.jdbcx.JdbcDataSource
 
-val dsl: Dsl[IO] = new Dsl[IO]
-import dsl.*
+import Dsl.IO._
 
 val ds = new JdbcDataSource()
 ds.setUrl("jdbc:h2:mem:hello;DB_CLOSE_DELAY=1")
