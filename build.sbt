@@ -18,7 +18,7 @@ lazy val module = project
     publishingSettings,
     name := "nyanda",
     libraryDependencies ++= Seq(
-      "org.typelevel" %% "cats-effect" % "3.3.11"
+      "org.typelevel" %% "cats-effect" % "3.3.12"
     )
   )
 
