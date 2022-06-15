@@ -6,7 +6,7 @@ ThisBuild / scalaVersion := scalaVersion_3
 
 lazy val commonDependencies = Seq(
   libraryDependencies ++= Seq(
-    "com.h2database" % "h2" % "2.1.212" % Test,
+    "com.h2database" % "h2" % "2.1.214" % Test,
     "org.scalameta" %% "munit" % "1.0.0-M5" % Test
   )
 )
@@ -29,7 +29,7 @@ lazy val example = project
     nonPublishSettings,
     name := "nyanda-example",
     libraryDependencies ++= Seq(
-      "com.h2database" % "h2" % "2.1.212"
+      "com.h2database" % "h2" % "2.1.214"
     ),
     run / fork := true
   )
