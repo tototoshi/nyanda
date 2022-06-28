@@ -7,7 +7,7 @@ ThisBuild / scalaVersion := scalaVersion_3
 lazy val commonDependencies = Seq(
   libraryDependencies ++= Seq(
     "com.h2database" % "h2" % "2.1.214" % Test,
-    "org.scalameta" %% "munit" % "1.0.0-M5" % Test
+    "org.scalameta" %% "munit" % "1.0.0-M6" % Test
   )
 )
 
