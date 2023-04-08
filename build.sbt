@@ -1,4 +1,4 @@
-val scalaVersion_3 = "3.2.1"
+val scalaVersion_3 = "3.2.2"
 
 ThisBuild / organization := "com.github.tototoshi"
 ThisBuild / version := "0.1.0-SNAPSHOT"
@@ -18,7 +18,7 @@ lazy val module = project
     publishingSettings,
     name := "nyanda",
     libraryDependencies ++= Seq(
-      "org.typelevel" %% "cats-effect" % "3.3.14"
+      "org.typelevel" %% "cats-effect" % "3.4.8"
     )
   )
 
