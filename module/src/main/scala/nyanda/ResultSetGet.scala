@@ -40,21 +40,21 @@ object ResultSetGet:
   given [F[_]]: ResultSetGet[F, java.sql.Timestamp] = ResultSetGet(column => rs => rs.getTimestamp(column))
 
   given [F[_]: Functor, T](using g: ResultSetGet[F, java.sql.Timestamp]): ResultSetGet[F, java.time.Instant] =
-    g.map(_.toInstant)
+    g.map(t => if t == null then null else t.toInstant)
 
   given [F[_]: Functor, T](using g: ResultSetGet[F, java.sql.Timestamp]): ResultSetGet[F, java.util.Date] =
-    g.map(t => new java.util.Date(t.getTime))
+    g.map(t => if t == null then null else new java.util.Date(t.getTime))
 
   given [F[_]: Functor, T](using g: ResultSetGet[F, java.time.Instant]): ResultSetGet[F, java.time.ZonedDateTime] =
-    g.map(i => java.time.ZonedDateTime.ofInstant(i, java.time.ZoneId.systemDefault))
+    g.map(i => if i == null then null else java.time.ZonedDateTime.ofInstant(i, java.time.ZoneId.systemDefault))
 
   given [F[_]: Functor, T](using g: ResultSetGet[F, java.time.Instant]): ResultSetGet[F, java.time.LocalDateTime] =
-    g.map(i => java.time.LocalDateTime.ofInstant(i, java.time.ZoneId.systemDefault))
+    g.map(i => if i == null then null else java.time.LocalDateTime.ofInstant(i, java.time.ZoneId.systemDefault))
 
   given [F[_]]: ResultSetGet[F, java.sql.Date] = ResultSetGet(column => rs => rs.getDate(column))
 
   given [F[_]: Functor, T](using g: ResultSetGet[F, java.sql.Date]): ResultSetGet[F, java.time.LocalDate] =
-    g.map(_.toLocalDate)
+    g.map(d => if d == null then null else d.toLocalDate)
 
   given [F[_]]: ResultSetGet[F, java.sql.Time] = ResultSetGet(column => rs => rs.getTime(column))
 
