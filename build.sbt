@@ -4,17 +4,18 @@ ThisBuild / organization := "com.github.tototoshi"
 ThisBuild / version := "0.1.0-SNAPSHOT"
 ThisBuild / scalaVersion := scalaVersion_3
 
-lazy val commonDependencies = Seq(
+lazy val commonSettings = Seq(
   libraryDependencies ++= Seq(
     "com.h2database" % "h2" % "2.1.214" % Test,
     "org.scalameta" %% "munit" % "1.0.0-M7" % Test
-  )
+  ),
+  publishTo := _publishTo(version.value),
 )
 
 lazy val module = project
   .in(file("module"))
   .settings(
-    commonDependencies,
+    commonSettings,
     publishingSettings,
     name := "nyanda",
     libraryDependencies ++= Seq(
@@ -25,7 +26,7 @@ lazy val module = project
 lazy val example = project
   .in(file("example"))
   .settings(
-    commonDependencies,
+    commonSettings,
     nonPublishSettings,
     name := "nyanda-example",
     libraryDependencies ++= Seq(
@@ -37,7 +38,10 @@ lazy val example = project
 
 lazy val root = project
   .in(file("."))
-  .settings(nonPublishSettings)
+  .settings(
+    commonSettings,
+    nonPublishSettings
+  )
   .aggregate(module, example)
 
 val publishingSettings = Seq(
