@@ -1,4 +1,4 @@
-val scalaVersion_3 = "3.2.2"
+val scalaVersion_3 = "3.3.0"
 
 ThisBuild / organization := "com.github.tototoshi"
 ThisBuild / version := "0.1.0-SNAPSHOT"
