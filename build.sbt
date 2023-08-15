@@ -9,7 +9,7 @@ lazy val commonSettings = Seq(
     "com.h2database" % "h2" % "2.1.214" % Test,
     "org.scalameta" %% "munit" % "1.0.0-M7" % Test
   ),
-  publishTo := _publishTo(version.value),
+  publishTo := _publishTo(version.value)
 )
 
 lazy val module = project
@@ -19,7 +19,7 @@ lazy val module = project
     publishingSettings,
     name := "nyanda",
     libraryDependencies ++= Seq(
-      "org.typelevel" %% "cats-effect" % "3.4.11"
+      "org.typelevel" %% "cats-effect" % "3.5.1"
     )
   )
 
