@@ -6,10 +6,10 @@ ThisBuild / scalaVersion := scalaVersion_3
 
 lazy val commonSettings = Seq(
   libraryDependencies ++= Seq(
-    "com.h2database" % "h2" % "2.1.214" % Test,
+    "com.h2database" % "h2" % "2.2.220" % Test,
     "org.scalameta" %% "munit" % "1.0.0-M7" % Test
   ),
-  publishTo := _publishTo(version.value),
+  publishTo := _publishTo(version.value)
 )
 
 lazy val module = project
@@ -30,7 +30,7 @@ lazy val example = project
     nonPublishSettings,
     name := "nyanda-example",
     libraryDependencies ++= Seq(
-      "com.h2database" % "h2" % "2.1.214"
+      "com.h2database" % "h2" % "2.2.220"
     ),
     run / fork := true
   )
