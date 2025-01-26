@@ -15,11 +15,11 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: Set up JDK 1.8
+    - name: Set up JDK
       uses: actions/setup-java@v4
       with:
-        distribution: "adopt"
-        java-version: 8
+        distribution: "temurin"
+        java-version: 11
     - uses: sbt/setup-sbt@v1
     - name: Run tests
       run: sbt test
