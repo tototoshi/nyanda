@@ -1,4 +1,4 @@
-val scalaVersion_3 = "3.3.3"
+val scalaVersion_3 = "3.3.4"
 
 ThisBuild / organization := "com.github.tototoshi"
 ThisBuild / version := "0.1.0"
@@ -7,7 +7,7 @@ ThisBuild / scalaVersion := scalaVersion_3
 lazy val commonSettings = Seq(
   libraryDependencies ++= Seq(
     "com.h2database" % "h2" % "2.2.224" % Test,
-    "org.scalameta" %% "munit" % "1.0.0" % Test
+    "org.scalameta" %% "munit" % "1.0.4" % Test
   ),
   publishTo := _publishTo(version.value)
 )
@@ -19,7 +19,7 @@ lazy val module = project
     publishingSettings,
     name := "nyanda",
     libraryDependencies ++= Seq(
-      "org.typelevel" %% "cats-effect" % "3.5.4"
+      "org.typelevel" %% "cats-effect" % "3.5.7"
     )
   )
 
